@@ -7,10 +7,10 @@ export default function DottedGlowBackgroundDemoSecond() {
       
       {/* Subtle Dotted Background */}
       <DottedGlowBackground
-        className="absolute inset-0 pointer-events-none"
-        opacity={0.4} 
-        gap={16} 
-        radius={1.2}
+        className="absolute inset-0 pointer-events-none blur-[4px]"
+        opacity={0.2} 
+        gap={24} 
+        radius={1.5}
         colorLightVar="--color-neutral-300"
         glowColorLightVar="--color-neutral-200"
         colorDarkVar="--color-neutral-800"
