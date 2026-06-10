@@ -108,7 +108,7 @@ export default function LandingPage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.4, ease: 'easeOut' }}
-          className="mt-6 text-lg text-[var(--ink-2)] max-w-xl leading-relaxed"
+          className="font-serif mt-6 text-lg text-[var(--ink-2)] max-w-xl leading-relaxed"
         >
           Explore startup opportunities, discover companies, and find roles that match your experience.
           Built for engineers who want to join something worth building.

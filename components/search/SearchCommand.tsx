@@ -32,17 +32,17 @@ export function SearchCommand() {
   const q = query.toLowerCase().trim();
   const results: Result[] = q
     ? [
-        ...DUMMY_JOBS.filter(
-          j => j.title.toLowerCase().includes(q) || j.companyName.toLowerCase().includes(q)
-        )
-          .slice(0, 4)
-          .map(j => ({ type: 'job' as const, id: j.id, title: j.title, company: j.companyName })),
-        ...DUMMY_COMPANIES.filter(
-          c => c.name.toLowerCase().includes(q) || c.tagline.toLowerCase().includes(q)
-        )
-          .slice(0, 3)
-          .map(c => ({ type: 'company' as const, id: c.id, name: c.name, tagline: c.tagline })),
-      ]
+      ...DUMMY_JOBS.filter(
+        j => j.title.toLowerCase().includes(q) || j.companyName.toLowerCase().includes(q)
+      )
+        .slice(0, 4)
+        .map(j => ({ type: 'job' as const, id: j.id, title: j.title, company: j.companyName })),
+      ...DUMMY_COMPANIES.filter(
+        c => c.name.toLowerCase().includes(q) || c.tagline.toLowerCase().includes(q)
+      )
+        .slice(0, 3)
+        .map(c => ({ type: 'company' as const, id: c.id, name: c.name, tagline: c.tagline })),
+    ]
     : [];
 
   const navigate = (result: Result) => {
