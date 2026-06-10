@@ -198,11 +198,13 @@ export default function JobsPage() {
           {/* Mobile filter button */}
           <div className="flex items-center justify-between mb-4 lg:hidden">
             <Sheet>
-              <SheetTrigger asChild>
-                <button id="mobile-filter-btn" className="flex items-center gap-2 px-4 py-2 border border-[var(--border)] text-sm font-medium text-[var(--ink)] hover:border-[var(--teal)] hover:text-[var(--teal)] transition-all rounded">
-                  <SlidersHorizontal className="w-4 h-4" />
-                  Filters {activeFilterCount > 0 && `(${activeFilterCount})`}
-                </button>
+              <SheetTrigger
+                render={
+                  <button id="mobile-filter-btn" className="flex items-center gap-2 px-4 py-2 border border-[var(--border)] text-sm font-medium text-[var(--ink)] hover:border-[var(--teal)] hover:text-[var(--teal)] transition-all rounded" />
+                }
+              >
+                <SlidersHorizontal className="w-4 h-4" />
+                Filters {activeFilterCount > 0 && `(${activeFilterCount})`}
               </SheetTrigger>
               <SheetContent side="left" className="w-72 bg-[var(--bg)] border-r border-[var(--border)] p-6 overflow-y-auto">
                 <SheetHeader className="mb-6">
