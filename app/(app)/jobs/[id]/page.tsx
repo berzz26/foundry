@@ -1,7 +1,7 @@
 'use client';
 
 import { notFound } from 'next/navigation';
-import { use } from 'react';
+import { use, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
@@ -9,9 +9,10 @@ import {
   CheckCircle2, Briefcase, Zap,
 } from 'lucide-react';
 import { DUMMY_JOBS } from '@/lib/dummy-data/jobs';
-import { DUMMY_COMPANIES } from '@/lib/dummy-data/companies';
+import { getCompanyById } from '@/lib/services/api';
 import { formatSalary, timeAgo, cn } from '@/lib/utils';
 import { useBookmarkStore } from '@/lib/store/bookmarks';
+import type { Company, Founder } from '@/types/company';
 
 const LOCATION_LABELS: Record<string, string> = {
   remote: 'Remote',
@@ -24,7 +25,14 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
   const job = DUMMY_JOBS.find(j => j.id === id);
   if (!job) notFound();
 
-  const company = DUMMY_COMPANIES.find(c => c.id === job.companyId);
+  const [company, setCompany] = useState<Company | null>(null);
+
+  useEffect(() => {
+    getCompanyById(job.companyId)
+      .then(res => setCompany(res))
+      .catch(console.error);
+  }, [job.companyId]);
+
   const { toggle, isBookmarked } = useBookmarkStore();
   const saved = isBookmarked(job.id);
   const salary = formatSalary(job.salaryMin, job.salaryMax, job.salaryCurrency);
@@ -188,10 +196,10 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
             <motion.div className="card-double-border p-5" initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}>
               <h2 className="font-serif text-lg text-[var(--ink)] mb-4">Founders</h2>
               <div className="flex flex-col gap-3">
-                {company.founders.map(f => (
+                {company.founders.map((f: Founder) => (
                   <div key={f.id} className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-full bg-[var(--teal)] flex items-center justify-center text-white text-sm font-semibold shrink-0">
-                      {f.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                      {f.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-[var(--ink)] truncate">{f.name}</p>

@@ -1,14 +1,15 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Search, X } from 'lucide-react';
 import CompanyCard from '@/components/cards/CompanyCard';
 import { CompanyCardSkeleton } from '@/components/skeletons';
-import { DUMMY_COMPANIES } from '@/lib/dummy-data/companies';
+import { getCompanies } from '@/lib/services/api';
 import { StaggerContainer, StaggerItem } from '@/components/animations';
 import { cn } from '@/lib/utils';
 import type { Stage } from '@/types/job';
+import type { Company } from '@/types/company';
 
 const STAGES: { value: Stage; label: string }[] = [
   { value: 'pre-seed', label: 'Pre-seed' },
@@ -17,30 +18,56 @@ const STAGES: { value: Stage; label: string }[] = [
   { value: 'series-b', label: 'Series B' },
 ];
 
-const INDUSTRIES = ['Developer Tools', 'Infrastructure', 'Fintech', 'HealthTech', 'Data Infrastructure', 'Cloud Infrastructure'];
-const BATCHES = ['YC W22', 'YC S23', 'YC W23', 'YC W24', 'YC S24'];
-
 export default function CompaniesPage() {
   const [search, setSearch] = useState('');
   const [stages, setStages] = useState<Stage[]>([]);
   const [industries, setIndustries] = useState<string[]>([]);
   const [batches, setBatches] = useState<string[]>([]);
   const [remoteOnly, setRemoteOnly] = useState(false);
-  const [loading] = useState(false);
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getCompanies()
+      .then(res => {
+        setCompanies(res.companies);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error(err);
+        setLoading(false);
+      });
+  }, []);
 
   const toggle = <T extends string>(arr: T[], val: T, set: (a: T[]) => void) =>
     set(arr.includes(val) ? arr.filter(v => v !== val) : [...arr, val]);
 
+  const industriesList = useMemo(() => {
+    const set = new Set<string>();
+    companies.forEach(c => {
+      if (c.industry) set.add(c.industry);
+    });
+    return Array.from(set).sort();
+  }, [companies]);
+
+  const batchesList = useMemo(() => {
+    const set = new Set<string>();
+    companies.forEach(c => {
+      if (c.batch) set.add(c.batch);
+    });
+    return Array.from(set).sort();
+  }, [companies]);
+
   const filtered = useMemo(() => {
-    let companies = DUMMY_COMPANIES;
+    let companiesList = companies;
     const q = search.toLowerCase().trim();
-    if (q) companies = companies.filter(c => c.name.toLowerCase().includes(q) || c.tagline.toLowerCase().includes(q) || c.industry.toLowerCase().includes(q));
-    if (stages.length) companies = companies.filter(c => stages.includes(c.stage));
-    if (industries.length) companies = companies.filter(c => industries.includes(c.industry));
-    if (batches.length) companies = companies.filter(c => c.batch && batches.includes(c.batch));
-    if (remoteOnly) companies = companies.filter(c => c.remoteFriendly);
-    return companies;
-  }, [search, stages, industries, batches, remoteOnly]);
+    if (q) companiesList = companiesList.filter(c => c.name.toLowerCase().includes(q) || c.tagline.toLowerCase().includes(q) || c.industry.toLowerCase().includes(q));
+    if (stages.length) companiesList = companiesList.filter(c => stages.includes(c.stage));
+    if (industries.length) companiesList = companiesList.filter(c => industries.includes(c.industry));
+    if (batches.length) companiesList = companiesList.filter(c => c.batch && batches.includes(c.batch));
+    if (remoteOnly) companiesList = companiesList.filter(c => c.remoteFriendly);
+    return companiesList;
+  }, [companies, search, stages, industries, batches, remoteOnly]);
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -77,10 +104,10 @@ export default function CompaniesPage() {
             >{s.label}</button>
           ))}
         </div>
-        <div className="w-px bg-[var(--border)] hidden sm:block" />
+        {batchesList.length > 0 && <div className="w-px bg-[var(--border)] hidden sm:block" />}
         {/* Batch chips */}
         <div className="flex flex-wrap gap-1.5">
-          {BATCHES.map(b => (
+          {batchesList.map(b => (
             <button key={b} id={`batch-filter-${b.replace(/\s/g, '-')}`}
               onClick={() => toggle(batches, b, setBatches)}
               className={cn('tech-badge cursor-pointer font-mono', batches.includes(b) && 'border-[var(--teal)] text-[var(--teal)] bg-[var(--teal-light)]')}
@@ -98,7 +125,7 @@ export default function CompaniesPage() {
 
       {/* Industry filter */}
       <div className="flex flex-wrap gap-1.5 mb-8">
-        {INDUSTRIES.map(ind => (
+        {industriesList.map(ind => (
           <button key={ind} id={`industry-filter-${ind.replace(/\s/g, '-')}`}
             onClick={() => toggle(industries, ind, setIndustries)}
             className={cn('tech-badge cursor-pointer', industries.includes(ind) && 'border-[var(--teal)] text-[var(--teal)] bg-[var(--teal-light)]')}

@@ -1,14 +1,15 @@
 'use client';
 
 import { notFound } from 'next/navigation';
-import { use } from 'react';
+import { use, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Globe, MapPin, Users, Link2, ExternalLink as TwitterIcon, ArrowRight, Briefcase } from 'lucide-react';
-import { DUMMY_COMPANIES } from '@/lib/dummy-data/companies';
-import { DUMMY_JOBS } from '@/lib/dummy-data/jobs';
+import { getCompanyById, getJobsByCompanyId } from '@/lib/services/api';
 import JobCard from '@/components/cards/JobCard';
 import { StaggerContainer, StaggerItem } from '@/components/animations';
+import type { Company } from '@/types/company';
+import type { Job } from '@/types/job';
 
 const STAGE_LABELS: Record<string, string> = {
   'pre-seed': 'Pre-seed', seed: 'Seed', 'series-a': 'Series A',
@@ -17,10 +18,38 @@ const STAGE_LABELS: Record<string, string> = {
 
 export default function CompanyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const company = DUMMY_COMPANIES.find(c => c.id === id);
-  if (!company) notFound();
+  const [company, setCompany] = useState<Company | null>(null);
+  const [openJobs, setOpenJobs] = useState<Job[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const openJobs = DUMMY_JOBS.filter(j => j.companyId === id);
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const comp = await getCompanyById(id);
+        if (comp) {
+          setCompany(comp);
+          const jobs = await getJobsByCompanyId(id);
+          setOpenJobs(jobs);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24 text-center">
+        <div className="w-8 h-8 rounded-full border-2 border-[var(--teal)] border-t-transparent animate-spin mb-4" />
+        <p className="text-sm text-[var(--ink-3)]">Loading company details...</p>
+      </div>
+    );
+  }
+
+  if (!company) notFound();
 
   return (
     <div className="max-w-5xl mx-auto">

@@ -6,7 +6,9 @@ import { ArrowRight, Briefcase, Building2, FileSearch, Users, Zap, Star, Trendin
 import { AnimatedCounter, SectionReveal } from '@/components/animations';
 import { AnimatedBackground } from '@/components/animations/AnimatedBackground';
 import { DottedGlowBackground } from '@/components/ui/dotted-glow-background';
-import { DUMMY_COMPANIES } from '@/lib/dummy-data/companies';
+import { useState, useEffect } from 'react';
+import { getCompanies } from '@/lib/services/api';
+import type { Company } from '@/types/company';
 
 const FEATURES = [
   {
@@ -53,6 +55,14 @@ const TESTIMONIALS = [
 ];
 
 export default function LandingPage() {
+  const [companies, setCompanies] = useState<Company[]>([]);
+
+  useEffect(() => {
+    getCompanies()
+      .then(res => setCompanies(res.companies))
+      .catch(console.error);
+  }, []);
+
   return (
     <div className="overflow-x-hidden">
       {/* ─── Hero ─────────────────────────────────────────────────────── */}
@@ -261,7 +271,7 @@ export default function LandingPage() {
 
           {/* Horizontal scroll */}
           <div className="flex gap-4 overflow-x-auto pb-4 -mx-6 px-6 scrollbar-hide">
-            {DUMMY_COMPANIES.map((company, i) => (
+            {companies.map((company, i) => (
               <motion.div
                 key={company.id}
                 initial={{ opacity: 0, x: 20 }}

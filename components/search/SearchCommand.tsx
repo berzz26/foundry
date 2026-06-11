@@ -3,9 +3,10 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Briefcase, Building2, ArrowRight } from 'lucide-react';
-import { DUMMY_JOBS } from '@/lib/dummy-data/jobs';
-import { DUMMY_COMPANIES } from '@/lib/dummy-data/companies';
+import { getJobs, getCompanies } from '@/lib/services/api';
 import { useRouter } from 'next/navigation';
+import type { Job } from '@/types/job';
+import type { Company } from '@/types/company';
 
 type Result =
   | { type: 'job'; id: string; title: string; company: string }
@@ -14,7 +15,15 @@ type Result =
 export function SearchCommand() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [companies, setCompanies] = useState<Company[]>([]);
   const router = useRouter();
+
+  // Fetch jobs and companies
+  useEffect(() => {
+    getJobs().then(res => setJobs(res.jobs)).catch(console.error);
+    getCompanies().then(res => setCompanies(res.companies)).catch(console.error);
+  }, []);
 
   // Ctrl+K / Cmd+K shortcut
   useEffect(() => {
@@ -32,12 +41,12 @@ export function SearchCommand() {
   const q = query.toLowerCase().trim();
   const results: Result[] = q
     ? [
-      ...DUMMY_JOBS.filter(
+      ...jobs.filter(
         j => j.title.toLowerCase().includes(q) || j.companyName.toLowerCase().includes(q)
       )
         .slice(0, 4)
         .map(j => ({ type: 'job' as const, id: j.id, title: j.title, company: j.companyName })),
-      ...DUMMY_COMPANIES.filter(
+      ...companies.filter(
         c => c.name.toLowerCase().includes(q) || c.tagline.toLowerCase().includes(q)
       )
         .slice(0, 3)

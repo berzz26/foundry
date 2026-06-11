@@ -15,7 +15,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: blob: https:",
-              "connect-src 'self' https:",
+              "connect-src 'self' https: http://localhost:3000 http://localhost:8080;",
               "object-src 'none'",
               "frame-ancestors 'self'",
             ].join('; '),

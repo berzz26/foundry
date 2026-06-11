@@ -1,14 +1,16 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Briefcase, Bookmark, Building2, TrendingUp, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
-import { DUMMY_JOBS } from '@/lib/dummy-data/jobs';
-import { DUMMY_COMPANIES } from '@/lib/dummy-data/companies';
+import { getJobs, getCompanies } from '@/lib/services/api';
 import { useBookmarkStore } from '@/lib/store/bookmarks';
 import JobCard from '@/components/cards/JobCard';
 import CompanyCard from '@/components/cards/CompanyCard';
 import { SectionReveal, StaggerContainer, StaggerItem } from '@/components/animations';
+import type { Job } from '@/types/job';
+import type { Company } from '@/types/company';
 
 function StatCard({ icon: Icon, label, value, sub, color = 'teal' }: {
   icon: React.ElementType; label: string; value: string | number; sub?: string; color?: string;
@@ -33,17 +35,56 @@ function StatCard({ icon: Icon, label, value, sub, color = 'teal' }: {
 
 export default function DashboardPage() {
   const { bookmarked } = useBookmarkStore();
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    totalJobs: 0,
+    matchedJobsCount: 0,
+    totalCompanies: 0,
+  });
+  const [recommendedJobs, setRecommendedJobs] = useState<Job[]>([]);
+  const [recentJobs, setRecentJobs] = useState<Job[]>([]);
+  const [trendingCompanies, setTrendingCompanies] = useState<Company[]>([]);
 
-  const recommendedJobs = DUMMY_JOBS
-    .filter(j => j.matchPercentage !== undefined)
-    .sort((a, b) => (b.matchPercentage ?? 0) - (a.matchPercentage ?? 0))
-    .slice(0, 4);
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const { companies } = await getCompanies();
+        const { jobs } = await getJobs();
+        
+        const recommended = jobs
+          .filter(j => j.matchPercentage !== undefined)
+          .sort((a, b) => (b.matchPercentage ?? 0) - (a.matchPercentage ?? 0))
+          .slice(0, 4);
 
-  const recentJobs = [...DUMMY_JOBS]
-    .sort((a, b) => new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime())
-    .slice(0, 4);
+        const recent = [...jobs]
+          .sort((a, b) => new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime())
+          .slice(0, 4);
 
-  const trendingCompanies = DUMMY_COMPANIES.slice(0, 4);
+        setRecommendedJobs(recommended);
+        setRecentJobs(recent);
+        setTrendingCompanies(companies.slice(0, 4));
+        setStats({
+          totalJobs: jobs.length,
+          matchedJobsCount: jobs.filter(j => j.matchPercentage).length,
+          totalCompanies: companies.length,
+        });
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24 text-center">
+        <div className="w-8 h-8 rounded-full border-2 border-[var(--teal)] border-t-transparent animate-spin mb-4" />
+        <p className="text-sm text-[var(--ink-3)]">Loading dashboard data...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto space-y-8">
@@ -56,10 +97,10 @@ export default function DashboardPage() {
       {/* Stats */}
       <SectionReveal delay={0.05}>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard icon={Briefcase} label="Total Jobs" value={DUMMY_JOBS.length} sub="Across all companies" />
+          <StatCard icon={Briefcase} label="Total Jobs" value={stats.totalJobs} sub="Across all companies" />
           <StatCard icon={Bookmark} label="Saved Jobs" value={bookmarked.length} sub="In your bookmarks" />
-          <StatCard icon={TrendingUp} label="Matched Jobs" value={DUMMY_JOBS.filter(j => j.matchPercentage).length} sub="Based on your resume" />
-          <StatCard icon={Building2} label="Companies" value={DUMMY_COMPANIES.length} sub="Actively hiring" />
+          <StatCard icon={TrendingUp} label="Matched Jobs" value={stats.matchedJobsCount} sub="Based on your resume" />
+          <StatCard icon={Building2} label="Companies" value={stats.totalCompanies} sub="Actively hiring" />
         </div>
       </SectionReveal>
 
