@@ -19,13 +19,11 @@ const MOCK_FOUNDERS: Founder[] = [
 export function parseTechStack(techStackStr: string | undefined | null): string[] {
   if (!techStackStr) return [];
 
-  // If formatted as a bulleted/numbered/newline list
   const lines = techStackStr.split(/[\r\n]+/);
   const items = lines
     .map(l => l.replace(/^[•\-\*\s\d\.]+/, '').trim())
     .filter(l => l.length > 0);
 
-  // If it behaves like a list of skills (short items, few words per line)
   const looksLikeList = items.length > 0 && items.every(item => item.length < 50 && item.split(' ').length <= 4);
   if (looksLikeList) {
     return items.flatMap(item => {
@@ -36,7 +34,6 @@ export function parseTechStack(techStackStr: string | undefined | null): string[
     });
   }
 
-  // If it's a paragraph or custom description, scan/match common technologies
   const commonTech = [
     'React', 'Next.js', 'TypeScript', 'JavaScript', 'Node.js', 'Go', 'Golang', 'Rust',
     'Python', 'Django', 'FastAPI', 'Flask', 'Ruby', 'Rails', 'Java', 'Spring', 'Kotlin',
@@ -59,15 +56,34 @@ export function parseTechStack(techStackStr: string | undefined | null): string[
   return ['AI', 'SaaS', 'Web'];
 }
 
+/**
+ * Strips expired AWS pre-signed query params from S3 logo URLs.
+ * Pre-signed URLs expire after their X-Amz-Expires window; stripping the
+ * signature makes the URL a plain public object URL (works if the bucket
+ * allows public reads, which YC's bookface-images bucket does for logos).
+ */
+function cleanLogoUrl(url: string | undefined | null): string | undefined {
+  if (!url) return undefined;
+  // Unescape unicode-escaped ampersands that sometimes come from the API
+  const fixed = url.replace(/\\u0026/g, '&');
+  try {
+    const parsed = new URL(fixed);
+    if (parsed.searchParams.has('X-Amz-Signature')) {
+      parsed.search = '';
+      return parsed.toString();
+    }
+    return fixed;
+  } catch {
+    return fixed;
+  }
+}
+
 function mapApiCompanyToCompany(c: any): Company {
   const numId = Number(c.id) || 0;
 
-  // Distribute stage evenly across companies based on ID
   const stages: Stage[] = ['pre-seed', 'seed', 'series-a', 'series-b'];
   const stage = stages[numId % stages.length];
-  const fixedUrl = c.logoUrl?.replace(/\\u0026/g, "&");
-  console.log(c.logoUrl)
-  // Assign mock founders based on ID
+
   const founders = [
     MOCK_FOUNDERS[numId % MOCK_FOUNDERS.length],
     MOCK_FOUNDERS[(numId + 1) % MOCK_FOUNDERS.length],
@@ -78,7 +94,7 @@ function mapApiCompanyToCompany(c: any): Company {
     name: c.name || '',
     tagline: c.tagline || '',
     description: c.description || '',
-    logo: fixedUrl,
+    logo: cleanLogoUrl(c.logoUrl),
     smallLogoUrl: c.smallLogoUrl,
     website: c.website || undefined,
     stage,
@@ -95,7 +111,6 @@ function mapApiCompanyToCompany(c: any): Company {
   };
 }
 
-// Simulated network delay for realistic UX (jobs/resume match only)
 const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
 
 // ─── Jobs ────────────────────────────────────────────────────────────────────
@@ -212,4 +227,3 @@ export async function getResumeMatches(): Promise<ResumeMatchResult> {
     matchedJobs: matched,
   };
 }
-
