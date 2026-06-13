@@ -37,4 +37,6 @@ export interface CompanyFilters {
   stage?: Stage[];
   industry?: string[];
   remoteFriendly?: boolean;
+  limit?: number;
+  offset?: number;
 }

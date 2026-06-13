@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Search, X } from 'lucide-react';
 import CompanyCard from '@/components/cards/CompanyCard';
@@ -26,11 +26,16 @@ export default function CompaniesPage() {
   const [remoteOnly, setRemoteOnly] = useState(false);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
+  const [offset, setOffset] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const limit = 20;
 
   useEffect(() => {
-    getCompanies()
+    getCompanies({ limit, offset: 0 })
       .then(res => {
         setCompanies(res.companies);
+        setHasMore(res.companies.length >= limit);
         setLoading(false);
       })
       .catch(err => {
@@ -38,6 +43,40 @@ export default function CompaniesPage() {
         setLoading(false);
       });
   }, []);
+
+  const loadMore = useCallback(() => {
+    if (loadingMore || !hasMore) return;
+    setLoadingMore(true);
+    const nextOffset = offset + limit;
+    getCompanies({ limit, offset: nextOffset })
+      .then(res => {
+        setCompanies(prev => {
+          const newCompanies = res.companies.filter(
+            c => !prev.some(p => p.id === c.id)
+          );
+          return [...prev, ...newCompanies];
+        });
+        setHasMore(res.companies.length >= limit);
+        setOffset(nextOffset);
+        setLoadingMore(false);
+      })
+      .catch(err => {
+        console.error(err);
+        setLoadingMore(false);
+      });
+  }, [loadingMore, hasMore, offset]);
+
+  const observer = useRef<IntersectionObserver | null>(null);
+  const lastElementRef = useCallback((node: HTMLDivElement | null) => {
+    if (loading || loadingMore) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasMore) {
+        loadMore();
+      }
+    });
+    if (node) observer.current.observe(node);
+  }, [loading, loadingMore, hasMore, loadMore]);
 
   const toggle = <T extends string>(arr: T[], val: T, set: (a: T[]) => void) =>
     set(arr.includes(val) ? arr.filter(v => v !== val) : [...arr, val]);
@@ -144,13 +183,20 @@ export default function CompaniesPage() {
           <p className="text-sm text-[var(--ink-3)]">Try adjusting your filters</p>
         </div>
       ) : (
-        <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filtered.map(company => (
-            <StaggerItem key={company.id}>
-              <CompanyCard company={company} />
-            </StaggerItem>
-          ))}
-        </StaggerContainer>
+        <>
+          <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filtered.map(company => (
+              <StaggerItem key={company.id}>
+                <CompanyCard company={company} />
+              </StaggerItem>
+            ))}
+          </StaggerContainer>
+          {hasMore && (
+            <div ref={lastElementRef} className="flex justify-center py-8">
+              {loadingMore && <div className="w-8 h-8 rounded-full border-2 border-[var(--teal)] border-t-transparent animate-spin" />}
+            </div>
+          )}
+        </>
       )}
     </div>
   );

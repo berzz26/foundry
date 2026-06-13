@@ -155,7 +155,9 @@ export async function getCompanies(
   filters?: CompanyFilters
 ): Promise<{ companies: Company[]; total: number }> {
   try {
-    const res = await axios.get(`${API_BASE_URL}/companies?limit=20`);
+    const limit = filters?.limit || 20;
+    const offset = filters?.offset || 0;
+    const res = await axios.get(`${API_BASE_URL}/companies?limit=${limit}&offset=${offset}`);
     const data = res.data;
     let companies = data.map(mapApiCompanyToCompany);
 
