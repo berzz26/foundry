@@ -30,7 +30,7 @@ export default function CompanyCard({ company }: CompanyCardProps) {
         <img
           src={company.smallLogoUrl}
           alt={company.name}
-          className="w-10 h-10 rounded object-contain shrink-0 bg-[var(--teal-light)]"
+          className="w-10 h-10 rounded object-contain shrink-0"
         />
 
         <div>

@@ -69,7 +69,7 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
             <img
               src={company.logo}
               alt={company.name}
-              className="w-16 h-16 rounded object-contain shrink-0 bg-[var(--teal-light)]"
+              className="w-16 h-16 rounded object-contain shrink-0"
             />
             <div>
               <h1 className="font-serif text-3xl text-[var(--ink)] leading-tight">{company.name}</h1>
