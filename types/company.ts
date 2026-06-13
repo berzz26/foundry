@@ -16,6 +16,7 @@ export interface Company {
   tagline: string;
   description: string;
   logo?: string;
+  smallLogoUrl?: string;
   website?: string;
   stage: Stage;
   batch?: string;

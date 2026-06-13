@@ -18,7 +18,7 @@ const MOCK_FOUNDERS: Founder[] = [
 
 export function parseTechStack(techStackStr: string | undefined | null): string[] {
   if (!techStackStr) return [];
-  
+
   // If formatted as a bulleted/numbered/newline list
   const lines = techStackStr.split(/[\r\n]+/);
   const items = lines
@@ -66,7 +66,7 @@ function mapApiCompanyToCompany(c: any): Company {
   const stages: Stage[] = ['pre-seed', 'seed', 'series-a', 'series-b'];
   const stage = stages[numId % stages.length];
   const fixedUrl = c.logoUrl?.replace(/\\u0026/g, "&");
-
+  console.log(c.logoUrl)
   // Assign mock founders based on ID
   const founders = [
     MOCK_FOUNDERS[numId % MOCK_FOUNDERS.length],
@@ -79,6 +79,7 @@ function mapApiCompanyToCompany(c: any): Company {
     tagline: c.tagline || '',
     description: c.description || '',
     logo: fixedUrl,
+    smallLogoUrl: c.smallLogoUrl,
     website: c.website || undefined,
     stage,
     batch: c.batch || undefined,

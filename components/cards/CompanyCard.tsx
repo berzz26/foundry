@@ -27,11 +27,12 @@ export default function CompanyCard({ company }: CompanyCardProps) {
     >
       {/* Logo + Name */}
       <div className="flex items-start gap-3 mb-3">
-        <div className="w-10 h-10 rounded bg-[var(--teal-light)] border border-[var(--border)] flex items-center justify-center shrink-0 group-hover:border-[rgba(13,115,119,0.3)] transition-colors">
-          <span className="font-serif italic text-[var(--teal)] text-base font-bold">
-            {company.name.charAt(0)}
-          </span>
-        </div>
+        <img
+          src={company.smallLogoUrl}
+          alt={company.name}
+          className="w-10 h-10 rounded object-contain shrink-0 bg-[var(--teal-light)]"
+        />
+
         <div>
           <h3 className="font-serif text-base text-[var(--ink)] group-hover:text-[var(--teal)] transition-colors leading-tight">
             {company.name}

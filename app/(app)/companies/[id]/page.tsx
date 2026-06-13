@@ -66,9 +66,11 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
       >
         <div className="flex items-start justify-between gap-6 flex-wrap mb-6">
           <div className="flex items-center gap-5">
-            <div className="w-16 h-16 rounded bg-[var(--teal-light)] border border-[var(--border)] flex items-center justify-center">
-              <span className="font-serif italic text-[var(--teal)] text-3xl font-bold">{company.name.charAt(0)}</span>
-            </div>
+            <img
+              src={company.logo}
+              alt={company.name}
+              className="w-16 h-16 rounded object-contain shrink-0 bg-[var(--teal-light)]"
+            />
             <div>
               <h1 className="font-serif text-3xl text-[var(--ink)] leading-tight">{company.name}</h1>
               <p className="text-[var(--ink-2)] mt-1">{company.tagline}</p>
