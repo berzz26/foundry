@@ -20,8 +20,8 @@ const LOCATION_LABELS: Record<string, string> = {
 
 export default function JobCard({ job, compact = false }: JobCardProps) {
   const { toggle, isBookmarked } = useBookmarkStore();
-  const saved = isBookmarked(job.id);
-  const salary = formatSalary(job.salaryMin, job.salaryMax, job.salaryCurrency);
+  const saved = isBookmarked(job.id.toString());
+  const salary = formatSalary(job.salary?.min, job.salary?.max, job.salary?.currency);
 
   return (
     <motion.article
@@ -33,10 +33,14 @@ export default function JobCard({ job, compact = false }: JobCardProps) {
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex items-center gap-3">
           {/* Company logo placeholder */}
-          <div className="w-9 h-9 rounded bg-[var(--teal-light)] border border-[var(--border)] flex items-center justify-center shrink-0">
-            <span className="font-serif italic text-[var(--teal)] text-sm font-bold">
-              {job.companyName.charAt(0)}
-            </span>
+          <div className="w-9 h-9 rounded bg-[var(--teal-light)] border border-[var(--border)] flex items-center justify-center shrink-0 overflow-hidden">
+            {job.company.logoUrl ? (
+              <img src={job.company.logoUrl} alt={job.company.name} className="w-full h-full object-cover" />
+            ) : (
+              <span className="font-serif italic text-[var(--teal)] text-sm font-bold">
+                {job.company.name.charAt(0)}
+              </span>
+            )}
           </div>
           <div>
             <Link
@@ -47,15 +51,15 @@ export default function JobCard({ job, compact = false }: JobCardProps) {
             </Link>
             <div className="flex items-center gap-2 mt-0.5">
               <Link
-                href={`/companies/${job.companyId}`}
+                href={`/companies/${job.company.id}`}
                 className="text-xs text-[var(--ink-3)] hover:text-[var(--teal)] transition-colors"
               >
-                {job.companyName}
+                {job.company.name}
               </Link>
-              {job.batch && (
+              {job.company.batch && (
                 <>
                   <span className="text-[var(--border-strong)]">·</span>
-                  <span className="text-xs font-mono text-[var(--ink-4)]">{job.batch}</span>
+                  <span className="text-xs font-mono text-[var(--ink-4)]">{job.company.batch}</span>
                 </>
               )}
             </div>
@@ -72,7 +76,7 @@ export default function JobCard({ job, compact = false }: JobCardProps) {
           )}
           <button
             id={`bookmark-${job.id}`}
-            onClick={() => toggle(job.id)}
+            onClick={() => toggle(job.id.toString())}
             aria-label={saved ? 'Remove bookmark' : 'Bookmark job'}
             className={cn(
               'w-7 h-7 flex items-center justify-center rounded border transition-all',
@@ -87,7 +91,7 @@ export default function JobCard({ job, compact = false }: JobCardProps) {
       </div>
 
       {/* Description preview */}
-      {!compact && (
+      {!compact && job.description && (
         <p className="text-sm text-[var(--ink-2)] leading-relaxed line-clamp-2 mb-3">
           {job.description}
         </p>
@@ -95,37 +99,43 @@ export default function JobCard({ job, compact = false }: JobCardProps) {
 
       {/* Meta row */}
       <div className="flex flex-wrap items-center gap-3 mb-3">
-        <div className="flex items-center gap-1 text-xs text-[var(--ink-3)]">
-          <MapPin className="w-3 h-3" />
-          <span>{job.location}</span>
-        </div>
-        <span
-          className={cn(
-            'text-xs px-2 py-0.5 rounded-full border font-medium',
-            job.locationType === 'remote'
-              ? 'border-emerald-200 text-emerald-700 bg-emerald-50'
-              : job.locationType === 'hybrid'
-              ? 'border-amber-200 text-amber-700 bg-amber-50'
-              : 'border-[var(--border)] text-[var(--ink-3)]'
-          )}
-        >
-          {LOCATION_LABELS[job.locationType]}
-        </span>
+        {job.location && (
+          <div className="flex items-center gap-1 text-xs text-[var(--ink-3)]">
+            <MapPin className="w-3 h-3" />
+            <span>{job.location}</span>
+          </div>
+        )}
+        {(job.locationType || (job.remote ? 'remote' : null)) && (
+          <span
+            className={cn(
+              'text-xs px-2 py-0.5 rounded-full border font-medium',
+              (job.locationType || (job.remote ? 'remote' : 'onsite')) === 'remote'
+                ? 'border-emerald-200 text-emerald-700 bg-emerald-50'
+                : (job.locationType === 'hybrid')
+                ? 'border-amber-200 text-amber-700 bg-amber-50'
+                : 'border-[var(--border)] text-[var(--ink-3)]'
+            )}
+          >
+            {LOCATION_LABELS[job.locationType || (job.remote ? 'remote' : 'onsite')] || 'On-site'}
+          </span>
+        )}
         {salary && (
           <span className="text-xs font-mono text-[var(--ink-2)] font-medium">{salary}</span>
         )}
-        <span className="text-xs text-[var(--ink-4)] ml-auto">{timeAgo(job.postedAt)}</span>
+        <span className="text-xs text-[var(--ink-4)] ml-auto">{timeAgo(job.createdAt)}</span>
       </div>
 
       {/* Tech Stack */}
-      <div className="flex flex-wrap gap-1.5 mb-4">
-        {job.techStack.slice(0, compact ? 3 : 5).map(tech => (
-          <span key={tech} className="tech-badge">{tech}</span>
-        ))}
-        {job.techStack.length > (compact ? 3 : 5) && (
-          <span className="tech-badge text-[var(--ink-4)]">+{job.techStack.length - (compact ? 3 : 5)}</span>
-        )}
-      </div>
+      {job.techStack && job.techStack.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mb-4">
+          {job.techStack.slice(0, compact ? 3 : 5).map(tech => (
+            <span key={tech} className="tech-badge">{tech}</span>
+          ))}
+          {job.techStack.length > (compact ? 3 : 5) && (
+            <span className="tech-badge text-[var(--ink-4)]">+{job.techStack.length - (compact ? 3 : 5)}</span>
+          )}
+        </div>
+      )}
 
       {/* Actions */}
       <div className="flex items-center gap-2">

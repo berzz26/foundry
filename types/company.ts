@@ -36,7 +36,12 @@ export interface CompanyFilters {
   batch?: string[];
   stage?: Stage[];
   industry?: string[];
-  remoteFriendly?: boolean;
+  remoteFriendly?: boolean; // We might keep this locally if we want, or map to location? The prompt didn't say backend supports remoteFriendly directly, but we can pass location.
+  location?: string;
+  country?: string;
+  minTeamSize?: number;
+  maxTeamSize?: number;
+  sort?: string;
   limit?: number;
   offset?: number;
 }

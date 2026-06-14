@@ -3,23 +3,34 @@ export type LocationType = 'remote' | 'hybrid' | 'onsite';
 export type Stage = 'pre-seed' | 'seed' | 'series-a' | 'series-b' | 'series-c' | 'growth';
 
 export interface Job {
-  id: string;
+  id: number | string;
   title: string;
-  companyId: string;
-  companyName: string;
-  companyLogo?: string;
-  location: string;
-  locationType: LocationType;
-  type: JobType;
-  salaryMin?: number;
-  salaryMax?: number;
-  salaryCurrency?: string;
-  techStack: string[];
-  description: string;
-  requirements: string[];
-  responsibilities: string[];
-  postedAt: string;
-  batch?: string;
+  company: {
+    id: number | string;
+    name: string;
+    logoUrl?: string;
+    batch?: string;
+  };
+  location?: string | null;
+  remote?: boolean;
+  type?: JobType;
+  salary?: {
+    min?: number;
+    max?: number;
+    currency?: string;
+  };
+  equity?: {
+    min?: number;
+    max?: number;
+  };
+  experience?: {
+    minYears?: number;
+  };
+  techStack?: string[];
+  description?: string;
+  requirements?: string[];
+  responsibilities?: string[];
+  createdAt: string;
   stage?: Stage;
   industry?: string;
   matchPercentage?: number;
