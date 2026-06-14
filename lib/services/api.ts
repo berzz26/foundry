@@ -192,14 +192,15 @@ export async function getCompanies(
 
     const res = await axios.get(`${API_BASE_URL}/companies?${params.toString()}`);
     const data = res.data;
-    let companies = data.map(mapApiCompanyToCompany);
+    const items = data.companies || data;
+    let companies = Array.isArray(items) ? items.map(mapApiCompanyToCompany) : [];
 
     // Apply any local fallback filters if backend doesn't support them fully
     if (filters?.remoteFriendly) {
       companies = companies.filter((c: Company) => c.remoteFriendly);
     }
 
-    return { companies, total: companies.length };
+    return { companies, total: data.pagination?.total || companies.length };
   } catch (error) {
     console.error('getCompanies error:', error);
     return { companies: [], total: 0 };

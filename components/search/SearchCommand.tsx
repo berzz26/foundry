@@ -42,15 +42,15 @@ export function SearchCommand() {
   const results: Result[] = q
     ? [
       ...jobs.filter(
-        j => j.title.toLowerCase().includes(q) || j.companyName.toLowerCase().includes(q)
+        j => j.title.toLowerCase().includes(q) || j.company?.name.toLowerCase().includes(q)
       )
         .slice(0, 4)
-        .map(j => ({ type: 'job' as const, id: j.id, title: j.title, company: j.companyName })),
+        .map(j => ({ type: 'job' as const, id: String(j.id), title: j.title, company: j.company?.name || '' })),
       ...companies.filter(
         c => c.name.toLowerCase().includes(q) || c.tagline.toLowerCase().includes(q)
       )
         .slice(0, 3)
-        .map(c => ({ type: 'company' as const, id: c.id, name: c.name, tagline: c.tagline })),
+        .map(c => ({ type: 'company' as const, id: String(c.id), name: c.name, tagline: c.tagline })),
     ]
     : [];
 
