@@ -128,7 +128,7 @@ export default function JobsPage() {
     search: '', locationTypes: [], stages: [], industries: [], techStack: [],
   });
   const { data, isLoading } = useJobs({ limit: 50 }); // Fetch more for local filtering if needed
-  const jobs = data?.jobs || [];
+  const jobs = useMemo(() => data?.jobs || [], [data?.jobs]);
 
   const filtered = useMemo(() => {
     let filteredJobs = jobs;

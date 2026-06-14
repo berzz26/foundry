@@ -9,6 +9,7 @@ export interface GetJobsParams {
   page?: number;
   limit?: number;
   search?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 }
 

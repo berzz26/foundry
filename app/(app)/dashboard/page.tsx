@@ -12,8 +12,8 @@ import { SectionReveal, StaggerContainer, StaggerItem } from '@/components/anima
 import type { Job } from '@/types/job';
 import type { Company } from '@/types/company';
 
-function StatCard({ icon: Icon, label, value, sub, color = 'teal' }: {
-  icon: React.ElementType; label: string; value: string | number; sub?: string; color?: string;
+function StatCard({ icon: Icon, label, value, sub }: {
+  icon: React.ElementType; label: string; value: string | number; sub?: string;
 }) {
   return (
     <motion.div
@@ -57,7 +57,7 @@ export default function DashboardPage() {
           .slice(0, 4);
 
         const recent = [...jobs]
-          .sort((a, b) => new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime())
+          .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime())
           .slice(0, 4);
 
         setRecommendedJobs(recommended);

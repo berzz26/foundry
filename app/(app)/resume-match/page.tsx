@@ -94,7 +94,7 @@ export default function ResumeMatchPage() {
 
   const matchedJobs = jobs
     .slice(0, 3)
-    .map(j => ({ ...j, matchPercentage: 75 + (j.id % 20) })) // Pseudo-random match score for demo purposes
+    .map(j => ({ ...j, matchPercentage: 75 + (Number(j.id) % 20) })) // Pseudo-random match score for demo purposes
     .sort((a, b) => (b.matchPercentage ?? 0) - (a.matchPercentage ?? 0));
 
   return (

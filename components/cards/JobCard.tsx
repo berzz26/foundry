@@ -12,11 +12,7 @@ interface JobCardProps {
   compact?: boolean;
 }
 
-const LOCATION_LABELS: Record<string, string> = {
-  remote: 'Remote',
-  hybrid: 'Hybrid',
-  onsite: 'On-site',
-};
+
 
 export default function JobCard({ job, compact = false }: JobCardProps) {
   const { toggle, isBookmarked } = useBookmarkStore();

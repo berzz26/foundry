@@ -77,6 +77,7 @@ function cleanLogoUrl(url: string | undefined | null): string | undefined {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function mapApiCompanyToCompany(c: any): Company {
   const numId = Number(c.id) || 0;
 
@@ -151,8 +152,8 @@ export async function getJobById(id: string | number): Promise<Job | null> {
   try {
     const res = await axios.get(`${API_BASE_URL}/jobs/${id}`);
     return res.data;
-  } catch (error) {
-    console.error(`getJobById(${id}) error:`, error);
+  } catch (err) {
+    console.error(`getJobById(${id}) error:`, err);
     return null;
   }
 }
