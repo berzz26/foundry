@@ -2,9 +2,9 @@
 
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, FileText, CheckCircle2, Loader2, X, Zap, Code2, Briefcase, GraduationCap, FolderOpen } from 'lucide-react';
+import { Upload, CheckCircle2, Loader2, X, Zap, Code2, Briefcase, GraduationCap, FolderOpen } from 'lucide-react';
 import MatchCard from '@/components/cards/MatchCard';
-import { DUMMY_JOBS } from '@/lib/dummy-data/jobs';
+import { useJobs } from '@/lib/hooks/useJobs';
 import { Progress } from '@/components/ui/progress';
 
 type UploadState = 'idle' | 'uploading' | 'parsing' | 'done';
@@ -89,8 +89,12 @@ export default function ResumeMatchPage() {
     if (file) handleFile(file);
   };
 
-  const matchedJobs = DUMMY_JOBS
-    .filter(j => j.matchPercentage !== undefined)
+  const { data } = useJobs({ limit: 10 });
+  const jobs = data?.jobs || [];
+
+  const matchedJobs = jobs
+    .slice(0, 3)
+    .map(j => ({ ...j, matchPercentage: 75 + (j.id % 20) })) // Pseudo-random match score for demo purposes
     .sort((a, b) => (b.matchPercentage ?? 0) - (a.matchPercentage ?? 0));
 
   return (

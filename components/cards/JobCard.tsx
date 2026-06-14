@@ -105,18 +105,16 @@ export default function JobCard({ job, compact = false }: JobCardProps) {
             <span>{job.location}</span>
           </div>
         )}
-        {(job.locationType || (job.remote ? 'remote' : null)) && (
+        {job.remote !== undefined && (
           <span
             className={cn(
               'text-xs px-2 py-0.5 rounded-full border font-medium',
-              (job.locationType || (job.remote ? 'remote' : 'onsite')) === 'remote'
+              job.remote
                 ? 'border-emerald-200 text-emerald-700 bg-emerald-50'
-                : (job.locationType === 'hybrid')
-                ? 'border-amber-200 text-amber-700 bg-amber-50'
                 : 'border-[var(--border)] text-[var(--ink-3)]'
             )}
           >
-            {LOCATION_LABELS[job.locationType || (job.remote ? 'remote' : 'onsite')] || 'On-site'}
+            {job.remote ? 'Remote' : 'On-site'}
           </span>
         )}
         {salary && (

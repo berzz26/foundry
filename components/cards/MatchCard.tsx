@@ -15,7 +15,7 @@ interface MatchCardProps {
 
 export default function MatchCard({ job, explanation }: MatchCardProps) {
   const { toggle, isBookmarked } = useBookmarkStore();
-  const saved = isBookmarked(job.id);
+  const saved = isBookmarked(job.id.toString());
   const pct = job.matchPercentage ?? 0;
 
   return (
@@ -54,7 +54,7 @@ export default function MatchCard({ job, explanation }: MatchCardProps) {
           <Link href={`/jobs/${job.id}`} className="font-serif text-base text-[var(--ink)] hover:text-[var(--teal)] transition-colors leading-tight block">
             {job.title}
           </Link>
-          <p className="text-sm text-[var(--ink-3)] mt-0.5 mb-2">{job.companyName} · {job.location}</p>
+          <p className="text-sm text-[var(--ink-3)] mt-0.5 mb-2">{job.company.name} {job.location && `· ${job.location}`}</p>
 
           {/* Explanation */}
           {explanation && (
@@ -72,11 +72,13 @@ export default function MatchCard({ job, explanation }: MatchCardProps) {
           )}
 
           {/* Tech */}
-          <div className="flex flex-wrap gap-1.5 mb-3">
-            {job.techStack.slice(0, 4).map(t => (
-              <span key={t} className="tech-badge">{t}</span>
-            ))}
-          </div>
+          {job.techStack && job.techStack.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mb-3">
+              {job.techStack.slice(0, 4).map(t => (
+                <span key={t} className="tech-badge">{t}</span>
+              ))}
+            </div>
+          )}
 
           {/* Actions */}
           <div className="flex items-center gap-2">
@@ -89,7 +91,7 @@ export default function MatchCard({ job, explanation }: MatchCardProps) {
             </Link>
             <button
               id={`match-bookmark-${job.id}`}
-              onClick={() => toggle(job.id)}
+              onClick={() => toggle(job.id.toString())}
               className={cn(
                 'flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded transition-all',
                 saved

@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { DUMMY_JOBS } from '@/lib/dummy-data/jobs';
 import type { Job, JobFilters, Stage } from '@/types/job';
 import type { Company, CompanyFilters, Founder } from '@/types/company';
 
@@ -103,7 +102,7 @@ function mapApiCompanyToCompany(c: any): Company {
     location: c.location || 'San Francisco, CA',
     remoteFriendly: c.location?.toLowerCase().includes('remote') || (numId % 2 === 0),
     techStack: parseTechStack(c.techStack),
-    openJobsCount: DUMMY_JOBS.filter(j => j.companyId === String(c.id)).length,
+    openJobsCount: c.openJobsCount || 0,
     founders,
     hiringDescription: c.hiringDescription || undefined,
     employeeCount: c.teamSize ? String(c.teamSize) : '1-10',
@@ -115,38 +114,47 @@ const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
 
 // ─── Jobs ────────────────────────────────────────────────────────────────────
 
-export async function getJobs(filters?: JobFilters): Promise<{ jobs: Job[]; total: number }> {
-  await delay(400);
-  let jobs = [...DUMMY_JOBS];
+export async function getJobs(filters?: JobFilters & { limit?: number; offset?: number }): Promise<{ jobs: Job[]; total: number }> {
+  try {
+    const params = new URLSearchParams();
+    if (filters?.limit) params.append('limit', String(filters.limit));
+    else params.append('limit', '50');
+    if (filters?.offset) params.append('offset', String(filters.offset));
 
-  if (filters?.search) {
-    const q = filters.search.toLowerCase();
-    jobs = jobs.filter(
-      j =>
-        j.title.toLowerCase().includes(q) ||
-        j.companyName.toLowerCase().includes(q) ||
-        j.techStack.some(t => t.toLowerCase().includes(q))
-    );
-  }
-  if (filters?.locationType?.length) {
-    jobs = jobs.filter(j => filters.locationType!.includes(j.locationType));
-  }
-  if (filters?.stage?.length) {
-    jobs = jobs.filter(j => j.stage && filters.stage!.includes(j.stage));
-  }
-  if (filters?.industry?.length) {
-    jobs = jobs.filter(j => j.industry && filters.industry!.includes(j.industry));
-  }
-  if (filters?.techStack?.length) {
-    jobs = jobs.filter(j => filters.techStack!.some(t => j.techStack.includes(t)));
-  }
+    // Handle string fields
+    if (filters?.search) params.append('search', filters.search);
+    if (filters?.location) params.append('location', filters.location);
 
-  return { jobs, total: jobs.length };
+    // Arrays
+    if (filters?.locationType?.length) {
+      filters.locationType.forEach(lt => params.append('locationType', lt));
+    }
+    if (filters?.stage?.length) {
+      filters.stage.forEach(s => params.append('stage', s));
+    }
+    if (filters?.industry?.length) {
+      filters.industry.forEach(i => params.append('industry', i));
+    }
+    if (filters?.techStack?.length) {
+      filters.techStack.forEach(t => params.append('techStack', t));
+    }
+
+    const res = await axios.get(`${API_BASE_URL}/jobs?${params.toString()}`);
+    return { jobs: res.data.jobs || [], total: res.data.pagination?.total || 0 };
+  } catch (error) {
+    console.error('getJobs error:', error);
+    return { jobs: [], total: 0 };
+  }
 }
 
-export async function getJobById(id: string): Promise<Job | null> {
-  await delay(200);
-  return DUMMY_JOBS.find(j => j.id === id) ?? null;
+export async function getJobById(id: string | number): Promise<Job | null> {
+  try {
+    const res = await axios.get(`${API_BASE_URL}/jobs/${id}`);
+    return res.data;
+  } catch (error) {
+    console.error(`getJobById(${id}) error:`, error);
+    return null;
+  }
 }
 
 // ─── Companies ───────────────────────────────────────────────────────────────
@@ -155,30 +163,37 @@ export async function getCompanies(
   filters?: CompanyFilters
 ): Promise<{ companies: Company[]; total: number }> {
   try {
-    const limit = filters?.limit || 20;
-    const offset = filters?.offset || 0;
-    const res = await axios.get(`${API_BASE_URL}/companies?limit=${limit}&offset=${offset}`);
+    const params = new URLSearchParams();
+    
+    if (filters?.limit) params.append('limit', String(filters.limit));
+    else params.append('limit', '20');
+    
+    if (filters?.offset) params.append('offset', String(filters.offset));
+    else params.append('offset', '0');
+
+    if (filters?.search) params.append('search', filters.search);
+    if (filters?.sort) params.append('sort', filters.sort);
+    if (filters?.location) params.append('location', filters.location);
+    if (filters?.country) params.append('country', filters.country);
+    if (filters?.minTeamSize !== undefined) params.append('minTeamSize', String(filters.minTeamSize));
+    if (filters?.maxTeamSize !== undefined) params.append('maxTeamSize', String(filters.maxTeamSize));
+
+    // Handle arrays by appending multiple times
+    if (filters?.stage?.length) {
+      filters.stage.forEach(s => params.append('stage', s));
+    }
+    if (filters?.industry?.length) {
+      filters.industry.forEach(i => params.append('industry', i));
+    }
+    if (filters?.batch?.length) {
+      filters.batch.forEach(b => params.append('batch', b));
+    }
+
+    const res = await axios.get(`${API_BASE_URL}/companies?${params.toString()}`);
     const data = res.data;
     let companies = data.map(mapApiCompanyToCompany);
 
-    if (filters?.search) {
-      const q = filters.search.toLowerCase();
-      companies = companies.filter(
-        (c: Company) =>
-          c.name.toLowerCase().includes(q) ||
-          c.tagline.toLowerCase().includes(q) ||
-          c.industry.toLowerCase().includes(q)
-      );
-    }
-    if (filters?.stage?.length) {
-      companies = companies.filter((c: Company) => filters.stage!.includes(c.stage));
-    }
-    if (filters?.industry?.length) {
-      companies = companies.filter((c: Company) => filters.industry!.includes(c.industry));
-    }
-    if (filters?.batch?.length) {
-      companies = companies.filter((c: Company) => c.batch && filters.batch!.includes(c.batch));
-    }
+    // Apply any local fallback filters if backend doesn't support them fully
     if (filters?.remoteFriendly) {
       companies = companies.filter((c: Company) => c.remoteFriendly);
     }
@@ -187,6 +202,22 @@ export async function getCompanies(
   } catch (error) {
     console.error('getCompanies error:', error);
     return { companies: [], total: 0 };
+  }
+}
+
+export interface CompaniesMeta {
+  batches: string[];
+  industries: string[];
+  stages: string[];
+}
+
+export async function getCompaniesMeta(): Promise<CompaniesMeta | null> {
+  try {
+    const res = await axios.get(`${API_BASE_URL}/companies/meta`);
+    return res.data;
+  } catch (error) {
+    console.error('getCompaniesMeta error:', error);
+    return null;
   }
 }
 
@@ -204,8 +235,13 @@ export async function getCompanyById(id: string): Promise<Company | null> {
   }
 }
 
-export async function getJobsByCompanyId(companyId: string): Promise<Job[]> {
-  return DUMMY_JOBS.filter(j => j.companyId === companyId);
+export async function getJobsByCompanyId(companyId: string | number): Promise<Job[]> {
+  try {
+    const res = await axios.get(`${API_BASE_URL}/jobs?companyId=${companyId}`);
+    return res.data.jobs || [];
+  } catch (error) {
+    return [];
+  }
 }
 
 // ─── Resume Match ─────────────────────────────────────────────────────────────
@@ -219,9 +255,14 @@ export interface ResumeMatchResult {
 
 export async function getResumeMatches(): Promise<ResumeMatchResult> {
   await delay(1500);
-  const matched = DUMMY_JOBS
-    .filter(j => j.matchPercentage !== undefined)
-    .sort((a, b) => (b.matchPercentage ?? 0) - (a.matchPercentage ?? 0));
+  let matched: Job[] = [];
+  try {
+    const res = await getJobs({ limit: 5 });
+    matched = res.jobs.map(j => ({ ...j, matchPercentage: Math.floor(Math.random() * 20) + 80 }));
+  } catch (error) {
+    console.error(error);
+  }
+  
   return {
     score: 87,
     matches: matched.length,

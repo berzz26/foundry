@@ -8,7 +8,7 @@ import {
   MapPin, Bookmark, ArrowLeft, Globe, Link2, ExternalLink as TwitterIcon,
   CheckCircle2, Briefcase, Zap,
 } from 'lucide-react';
-import { DUMMY_JOBS } from '@/lib/dummy-data/jobs';
+import { useJob } from '@/lib/hooks/useJobs';
 import { getCompanyById } from '@/lib/services/api';
 import { formatSalary, timeAgo, cn } from '@/lib/utils';
 import { useBookmarkStore } from '@/lib/store/bookmarks';
@@ -22,20 +22,24 @@ const LOCATION_LABELS: Record<string, string> = {
 
 export default function JobDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const job = DUMMY_JOBS.find(j => j.id === id);
-  if (!job) notFound();
+  const { data: job, isLoading } = useJob(id);
 
   const [company, setCompany] = useState<Company | null>(null);
 
   useEffect(() => {
-    getCompanyById(job.companyId)
-      .then(res => setCompany(res))
-      .catch(console.error);
-  }, [job.companyId]);
+    if (job?.company?.id) {
+      getCompanyById(job.company.id.toString())
+        .then(res => setCompany(res))
+        .catch(console.error);
+    }
+  }, [job?.company?.id]);
 
   const { toggle, isBookmarked } = useBookmarkStore();
-  const saved = isBookmarked(job.id);
-  const salary = formatSalary(job.salaryMin, job.salaryMax, job.salaryCurrency);
+  const saved = job ? isBookmarked(job.id.toString()) : false;
+  const salary = job ? formatSalary(job.salary?.min, job.salary?.max, job.salary?.currency) : null;
+
+  if (isLoading) return <div className="p-8 text-center text-[var(--ink-3)] text-sm">Loading job details...</div>;
+  if (!job) notFound();
 
   return (
     <div className="max-w-5xl mx-auto">
@@ -56,24 +60,28 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
           >
             <div className="flex items-start justify-between gap-4 mb-4">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded bg-[var(--teal-light)] border border-[var(--border)] flex items-center justify-center">
-                  <span className="font-serif italic text-[var(--teal)] text-xl font-bold">
-                    {job.companyName.charAt(0)}
-                  </span>
+                <div className="w-12 h-12 rounded bg-[var(--teal-light)] border border-[var(--border)] flex items-center justify-center overflow-hidden">
+                  {job.company.logoUrl ? (
+                    <img src={job.company.logoUrl} alt={job.company.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="font-serif italic text-[var(--teal)] text-xl font-bold">
+                      {job.company.name.charAt(0)}
+                    </span>
+                  )}
                 </div>
                 <div>
                   <h1 className="font-serif text-2xl text-[var(--ink)] leading-tight">{job.title}</h1>
                   <div className="flex items-center gap-2 mt-1 flex-wrap">
-                    <Link href={`/companies/${job.companyId}`} className="text-sm text-[var(--teal)] hover:underline font-medium">
-                      {job.companyName}
+                    <Link href={`/companies/${job.company.id}`} className="text-sm text-[var(--teal)] hover:underline font-medium">
+                      {job.company.name}
                     </Link>
-                    {job.batch && <span className="text-xs font-mono text-[var(--ink-4)]">{job.batch}</span>}
+                    {job.company.batch && <span className="text-xs font-mono text-[var(--ink-4)]">{job.company.batch}</span>}
                   </div>
                 </div>
               </div>
               <button
                 id={`job-detail-bookmark-${job.id}`}
-                onClick={() => toggle(job.id)}
+                onClick={() => toggle(job.id.toString())}
                 className={cn(
                   'w-9 h-9 flex items-center justify-center rounded border transition-all shrink-0',
                   saved ? 'bg-[var(--teal)] border-[var(--teal)] text-white' : 'border-[var(--border)] text-[var(--ink-4)] hover:border-[var(--teal)] hover:text-[var(--teal)]'
@@ -85,26 +93,30 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
 
             {/* Meta */}
             <div className="flex flex-wrap gap-3 mb-5">
-              <div className="flex items-center gap-1.5 text-sm text-[var(--ink-3)]">
-                <MapPin className="w-3.5 h-3.5" />
-                {job.location}
-              </div>
-              <span className={cn(
-                'text-xs px-2 py-0.5 rounded-full border font-medium',
-                job.locationType === 'remote' ? 'border-emerald-200 text-emerald-700 bg-emerald-50' :
-                job.locationType === 'hybrid' ? 'border-amber-200 text-amber-700 bg-amber-50' :
-                'border-[var(--border)] text-[var(--ink-3)]'
-              )}>
-                {LOCATION_LABELS[job.locationType]}
-              </span>
+              {job.location && (
+                <div className="flex items-center gap-1.5 text-sm text-[var(--ink-3)]">
+                  <MapPin className="w-3.5 h-3.5" />
+                  {job.location}
+                </div>
+              )}
+              {job.remote !== undefined && (
+                <span className={cn(
+                  'text-xs px-2 py-0.5 rounded-full border font-medium',
+                  job.remote ? 'border-emerald-200 text-emerald-700 bg-emerald-50' : 'border-[var(--border)] text-[var(--ink-3)]'
+                )}>
+                  {job.remote ? 'Remote' : 'On-site'}
+                </span>
+              )}
               {salary && <span className="text-sm font-mono text-[var(--ink-2)] font-medium">{salary}</span>}
-              <span className="text-xs text-[var(--ink-4)] ml-auto">{timeAgo(job.postedAt)}</span>
+              <span className="text-xs text-[var(--ink-4)] ml-auto">{timeAgo(job.createdAt)}</span>
             </div>
 
             {/* Tech Stack */}
-            <div className="flex flex-wrap gap-1.5 mb-5">
-              {job.techStack.map(t => <span key={t} className="tech-badge">{t}</span>)}
-            </div>
+            {job.techStack && job.techStack.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mb-5">
+                {job.techStack.map(t => <span key={t} className="tech-badge">{t}</span>)}
+              </div>
+            )}
 
             {/* Actions */}
             <div className="flex gap-3">
@@ -125,36 +137,42 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
           </motion.div>
 
           {/* About Role */}
-          <motion.section className="card-double-border p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
-            <h2 className="font-serif text-xl text-[var(--ink)] mb-4">About this role</h2>
-            <p className="text-sm text-[var(--ink-2)] leading-relaxed">{job.description}</p>
-          </motion.section>
+          {job.description && (
+            <motion.section className="card-double-border p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
+              <h2 className="font-serif text-xl text-[var(--ink)] mb-4">About this role</h2>
+              <p className="text-sm text-[var(--ink-2)] leading-relaxed">{job.description}</p>
+            </motion.section>
+          )}
 
           {/* Responsibilities */}
-          <motion.section className="card-double-border p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}>
-            <h2 className="font-serif text-xl text-[var(--ink)] mb-4">Responsibilities</h2>
-            <ul className="flex flex-col gap-2.5">
-              {job.responsibilities.map((r, i) => (
-                <li key={i} className="flex items-start gap-2.5 text-sm text-[var(--ink-2)]">
-                  <CheckCircle2 className="w-4 h-4 text-[var(--teal)] mt-0.5 shrink-0" />
-                  {r}
-                </li>
-              ))}
-            </ul>
-          </motion.section>
+          {job.responsibilities && job.responsibilities.length > 0 && (
+            <motion.section className="card-double-border p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}>
+              <h2 className="font-serif text-xl text-[var(--ink)] mb-4">Responsibilities</h2>
+              <ul className="flex flex-col gap-2.5">
+                {job.responsibilities.map((r, i) => (
+                  <li key={i} className="flex items-start gap-2.5 text-sm text-[var(--ink-2)]">
+                    <CheckCircle2 className="w-4 h-4 text-[var(--teal)] mt-0.5 shrink-0" />
+                    {r}
+                  </li>
+                ))}
+              </ul>
+            </motion.section>
+          )}
 
           {/* Requirements */}
-          <motion.section className="card-double-border p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
-            <h2 className="font-serif text-xl text-[var(--ink)] mb-4">Requirements</h2>
-            <ul className="flex flex-col gap-2.5">
-              {job.requirements.map((r, i) => (
-                <li key={i} className="flex items-start gap-2.5 text-sm text-[var(--ink-2)]">
-                  <div className="w-1.5 h-1.5 rounded-full bg-[var(--teal)] mt-1.5 shrink-0" />
-                  {r}
-                </li>
-              ))}
-            </ul>
-          </motion.section>
+          {job.requirements && job.requirements.length > 0 && (
+            <motion.section className="card-double-border p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
+              <h2 className="font-serif text-xl text-[var(--ink)] mb-4">Requirements</h2>
+              <ul className="flex flex-col gap-2.5">
+                {job.requirements.map((r, i) => (
+                  <li key={i} className="flex items-start gap-2.5 text-sm text-[var(--ink-2)]">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[var(--teal)] mt-1.5 shrink-0" />
+                    {r}
+                  </li>
+                ))}
+              </ul>
+            </motion.section>
+          )}
         </div>
 
         {/* Sidebar */}

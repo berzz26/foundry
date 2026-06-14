@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Search, SlidersHorizontal, X } from 'lucide-react';
 import JobCard from '@/components/cards/JobCard';
 import { JobCardSkeleton } from '@/components/skeletons';
-import { DUMMY_JOBS } from '@/lib/dummy-data/jobs';
+import { useJobs } from '@/lib/hooks/useJobs';
 import { StaggerContainer, StaggerItem } from '@/components/animations';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
@@ -127,23 +127,29 @@ export default function JobsPage() {
   const [filters, setFilters] = useState<Filters>({
     search: '', locationTypes: [], stages: [], industries: [], techStack: [],
   });
-  const [loading] = useState(false);
+  const { data, isLoading } = useJobs({ limit: 50 }); // Fetch more for local filtering if needed
+  const jobs = data?.jobs || [];
 
   const filtered = useMemo(() => {
-    let jobs = DUMMY_JOBS;
+    let filteredJobs = jobs;
     const q = filters.search.toLowerCase().trim();
     if (q) {
-      jobs = jobs.filter(
-        j => j.title.toLowerCase().includes(q) || j.companyName.toLowerCase().includes(q) ||
-          j.techStack.some(t => t.toLowerCase().includes(q))
+      filteredJobs = filteredJobs.filter(
+        j => j.title.toLowerCase().includes(q) || j.company.name.toLowerCase().includes(q) ||
+          (j.techStack && j.techStack.some(t => t.toLowerCase().includes(q)))
       );
     }
-    if (filters.locationTypes.length) jobs = jobs.filter(j => filters.locationTypes.includes(j.locationType));
-    if (filters.stages.length) jobs = jobs.filter(j => j.stage && filters.stages.includes(j.stage));
-    if (filters.industries.length) jobs = jobs.filter(j => j.industry && filters.industries.includes(j.industry));
-    if (filters.techStack.length) jobs = jobs.filter(j => filters.techStack.some(t => j.techStack.includes(t)));
-    return jobs;
-  }, [filters]);
+    if (filters.locationTypes.length) {
+      filteredJobs = filteredJobs.filter(j => {
+        const loc = j.remote ? 'remote' : 'onsite'; // Simplified logic, since locationType is gone
+        return filters.locationTypes.includes(loc as LocationType);
+      });
+    }
+    if (filters.stages.length) filteredJobs = filteredJobs.filter(j => j.stage && filters.stages.includes(j.stage));
+    if (filters.industries.length) filteredJobs = filteredJobs.filter(j => j.industry && filters.industries.includes(j.industry));
+    if (filters.techStack.length) filteredJobs = filteredJobs.filter(j => j.techStack && filters.techStack.some(t => j.techStack!.includes(t)));
+    return filteredJobs;
+  }, [filters, jobs]);
 
   const activeFilterCount = filters.locationTypes.length + filters.stages.length + filters.industries.length + filters.techStack.length;
 
@@ -215,7 +221,7 @@ export default function JobsPage() {
             </Sheet>
           </div>
 
-          {loading ? (
+          {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {[...Array(6)].map((_, i) => <JobCardSkeleton key={i} />)}
             </div>

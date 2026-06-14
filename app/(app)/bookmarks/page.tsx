@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Bookmark, Trash2, ExternalLink, MapPin, Calendar } from 'lucide-react';
 import { useBookmarkStore } from '@/lib/store/bookmarks';
-import { DUMMY_JOBS } from '@/lib/dummy-data/jobs';
+import { useJobs } from '@/lib/hooks/useJobs';
 import { formatSalary, timeAgo, cn } from '@/lib/utils';
 
 const STATUS_OPTIONS = ['Interested', 'Applied', 'Interviewing', 'Offer', 'Rejected'];
@@ -20,7 +20,9 @@ const STATUS_COLORS: Record<string, string> = {
 export default function BookmarksPage() {
   const { bookmarked, statuses, savedDates, toggle, setStatus } = useBookmarkStore();
 
-  const savedJobs = DUMMY_JOBS.filter(j => bookmarked.includes(j.id));
+  const { data, isLoading } = useJobs({ limit: 100 });
+  const jobs = data?.jobs || [];
+  const savedJobs = jobs.filter(j => bookmarked.includes(j.id.toString()));
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -28,7 +30,11 @@ export default function BookmarksPage() {
         <p className="text-sm text-[var(--ink-3)]">{savedJobs.length} saved job{savedJobs.length !== 1 ? 's' : ''}</p>
       </motion.div>
 
-      {savedJobs.length === 0 ? (
+      {isLoading ? (
+        <div className="card-double-border p-20 flex flex-col items-center justify-center text-center">
+          <p className="text-sm text-[var(--ink-3)]">Loading bookmarks...</p>
+        </div>
+      ) : savedJobs.length === 0 ? (
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -44,9 +50,9 @@ export default function BookmarksPage() {
       ) : (
         <div className="flex flex-col gap-3">
           {savedJobs.map((job, i) => {
-            const salary = formatSalary(job.salaryMin, job.salaryMax, job.salaryCurrency);
-            const savedDate = savedDates[job.id];
-            const status = statuses[job.id] ?? 'Interested';
+            const salary = formatSalary(job.salary?.min, job.salary?.max, job.salary?.currency);
+            const savedDate = savedDates[job.id.toString()];
+            const status = statuses[job.id.toString()] ?? 'Interested';
 
             return (
               <motion.div
@@ -58,8 +64,12 @@ export default function BookmarksPage() {
               >
                 <div className="flex items-start gap-4 flex-wrap">
                   {/* Company logo */}
-                  <div className="w-10 h-10 rounded bg-[var(--teal-light)] border border-[var(--border)] flex items-center justify-center shrink-0">
-                    <span className="font-serif italic text-[var(--teal)] font-bold">{job.companyName.charAt(0)}</span>
+                  <div className="w-10 h-10 rounded bg-[var(--teal-light)] border border-[var(--border)] flex items-center justify-center shrink-0 overflow-hidden">
+                    {job.company.logoUrl ? (
+                      <img src={job.company.logoUrl} alt={job.company.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="font-serif italic text-[var(--teal)] font-bold">{job.company.name.charAt(0)}</span>
+                    )}
                   </div>
 
                   {/* Content */}
@@ -69,14 +79,14 @@ export default function BookmarksPage() {
                         <Link href={`/jobs/${job.id}`} className="font-serif text-base text-[var(--ink)] hover:text-[var(--teal)] transition-colors">
                           {job.title}
                         </Link>
-                        <p className="text-sm text-[var(--ink-3)]">{job.companyName}</p>
+                        <p className="text-sm text-[var(--ink-3)]">{job.company.name}</p>
                       </div>
 
                       {/* Status selector */}
                       <select
                         id={`status-${job.id}`}
                         value={status}
-                        onChange={e => setStatus(job.id, e.target.value)}
+                        onChange={e => setStatus(job.id.toString(), e.target.value)}
                         className={cn(
                           'text-xs font-medium px-2 py-1 rounded border cursor-pointer outline-none bg-transparent',
                           STATUS_COLORS[status] ?? 'bg-[var(--bg-alt)] text-[var(--ink-2)] border-[var(--border)]'
@@ -111,7 +121,7 @@ export default function BookmarksPage() {
                       </Link>
                       <button
                         id={`remove-bookmark-${job.id}`}
-                        onClick={() => toggle(job.id)}
+                        onClick={() => toggle(job.id.toString())}
                         className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-[var(--border)] text-[var(--ink-3)] hover:border-rose-300 hover:text-rose-500 transition-all rounded"
                       >
                         <Trash2 className="w-3 h-3" />
