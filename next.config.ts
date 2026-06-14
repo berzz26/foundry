@@ -14,7 +14,7 @@ const nextConfig: NextConfig = {
               "script-src 'self' 'unsafe-inline' 'unsafe-eval'", // Note: unsafe-* needed for Next.js dev; restrict in production
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
-              "img-src 'self' data: blob: https:",
+              "img-src 'self' data: blob: http:",
               "connect-src 'self' https: http://localhost:3000 http://localhost:8080;",
               "object-src 'none'",
               "frame-ancestors 'self'",
