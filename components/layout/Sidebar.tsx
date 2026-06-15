@@ -60,11 +60,12 @@ export default function AppSidebar() {
                 const isActive = pathname === href || pathname.startsWith(href + '/');
                 return (
                   <SidebarMenuItem key={href}>
-                    <SidebarMenuButton asChild isActive={isActive}>
-                      <Link href={href} className="flex items-center gap-3 w-full">
-                        <Icon className="w-4 h-4 shrink-0" />
-                        <span>{label}</span>
-                      </Link>
+                    <SidebarMenuButton 
+                      isActive={isActive} 
+                      render={<Link href={href} className="flex items-center gap-3 w-full" />}
+                    >
+                      <Icon className="w-4 h-4 shrink-0" />
+                      <span>{label}</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 );
