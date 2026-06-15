@@ -31,8 +31,8 @@ export default function PublicNav() {
         }`}
       >
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 pl-1">
-          <img src="/icon.png" alt="Foundry Logo" className="w-10 h-10 object-contain shrink-0" />
+        <Link href="/" className="flex items-center gap-1 pl-1">
+          <img src="/icon.png" alt="Foundry Logo" className="w-12 h-12 object-cover shrink-0" />
           <span className="font-serif italic text-lg text-[var(--ink)]">Foundry</span>
         </Link>
 
