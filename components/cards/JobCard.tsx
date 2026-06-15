@@ -98,6 +98,59 @@ export default function JobCard({ job, compact = false }: JobCardProps) {
 
               {/* Modal Body */}
               <div className="p-6 md:p-8 overflow-y-auto flex-1">
+                 {/* Company & Job Snapshot */}
+                 <div className="mb-6 bg-[var(--bg-alt)] border border-[var(--border)] rounded-2xl p-4 md:p-5 flex flex-col gap-4">
+                   <div className="flex items-center justify-between border-b border-[var(--border)] pb-3">
+                     <div className="flex items-center gap-3">
+                       <div className="w-10 h-10 rounded-lg bg-[var(--teal-light)] border border-[var(--border)] flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
+                         {job.company.logoUrl ? (
+                           <img src={job.company.logoUrl} alt={job.company.name} className="w-full h-full object-cover" />
+                         ) : (
+                           <span className="font-serif italic text-[var(--teal)] text-base font-bold">
+                             {job.company.name.charAt(0)}
+                           </span>
+                         )}
+                       </div>
+                       <div>
+                         <Link 
+                           href={`/companies/${job.company.id}`}
+                           onClick={() => setActive(false)}
+                           className="font-serif text-base text-[var(--ink)] hover:text-[var(--teal)] transition-colors font-semibold"
+                         >
+                           {job.company.name}
+                         </Link>
+                         <p className="text-[10px] text-[var(--ink-4)] uppercase tracking-wider font-mono">Company ID: {job.company.id}</p>
+                       </div>
+                     </div>
+                     {job.company.batch && (
+                       <span className="px-2.5 py-1 rounded bg-[var(--teal-light)] border border-[rgba(13,115,119,0.15)] text-xs font-mono font-bold text-[var(--teal)]">
+                         {job.company.batch} Batch
+                       </span>
+                     )}
+                   </div>
+                   
+                   <div className="grid grid-cols-2 gap-3 text-sm">
+                     <div className="flex flex-col gap-0.5">
+                       <span className="text-[10px] uppercase tracking-wider text-[var(--ink-4)] font-bold">Experience Required</span>
+                       <span className="text-[var(--ink-2)] font-medium">
+                         {job.experience?.minYears !== undefined && job.experience.minYears !== null
+                           ? `${job.experience.minYears}+ year${job.experience.minYears !== 1 ? 's' : ''}`
+                           : 'Not specified'}
+                       </span>
+                     </div>
+                     <div className="flex flex-col gap-0.5">
+                       <span className="text-[10px] uppercase tracking-wider text-[var(--ink-4)] font-bold">Location</span>
+                       <span className="text-[var(--ink-2)] font-medium flex items-center gap-1">
+                         <MapPin className="w-3.5 h-3.5 text-[var(--ink-3)] shrink-0" />
+                         <span className="truncate">{job.location || 'Not specified'}</span>
+                         {job.remote !== undefined && (
+                           <span className="text-[10px] text-[var(--ink-4)]">({job.remote ? 'Remote' : 'On-site'})</span>
+                         )}
+                       </span>
+                     </div>
+                   </div>
+                 </div>
+
                  <h4 className="text-xs font-bold uppercase tracking-widest text-[var(--ink-4)] mb-3">About the role</h4>
                  <motion.div layoutId={`desc-${job.id}`} className="text-sm md:text-base text-[var(--ink-2)] whitespace-pre-line leading-relaxed mb-8">
                    {job.description || "No detailed description provided for this position."}
