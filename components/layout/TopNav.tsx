@@ -2,6 +2,7 @@
 
 import { Bell, Search } from 'lucide-react';
 import { usePathname } from 'next/navigation';
+import { SidebarTrigger } from '@/components/ui/sidebar';
 
 const PAGE_TITLES: Record<string, string> = {
   '/dashboard': 'Dashboard',
@@ -18,7 +19,8 @@ export default function TopNav() {
 
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between px-6 py-4 bg-[var(--bg)] border-b border-[var(--border)]">
-      <div>
+      <div className="flex items-center gap-3">
+        <SidebarTrigger className="-ml-2 md:hidden" />
         <h1 className="font-serif text-xl text-[var(--ink)]">{title}</h1>
       </div>
       <div className="flex items-center gap-2">

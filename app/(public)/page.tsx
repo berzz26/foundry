@@ -225,7 +225,7 @@ export default function LandingPage() {
             <div className="mb-6 font-sans font-bold text-[var(--teal)] uppercase tracking-[0.15em] text-[11px]">
               How it works
             </div>
-            <h2 className="font-serif text-4xl md:text-5xl tracking-tight leading-[1.05] max-w-lg text-white mb-20">
+            <h2 className="font-serif text-4xl md:text-5xl tracking-tight leading-[1.05] max-w-lg text-white/70 mb-20">
               Three steps.<br />
               <em className="text-white/70 italic">One great role.</em>
             </h2>
@@ -353,7 +353,7 @@ export default function LandingPage() {
                   <TrendingUp className="w-3 h-3" />
                   Join 10,000+ engineers
                 </div>
-                <h2 className="font-serif text-4xl md:text-5xl text-white tracking-tight mb-4">
+                <h2 className="font-serif text-4xl md:text-5xl text-white/70 tracking-tight mb-4">
                   Your next role,<br /><em className="text-white/70 italic">starts here.</em>
                 </h2>
                 <p className="text-white/60 text-base max-w-md mx-auto leading-relaxed mb-8">
