@@ -9,7 +9,6 @@ import {
   FileText,
   Bookmark,
   User,
-  Zap,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -40,9 +39,7 @@ export default function AppSidebar() {
     <Sidebar className="border-r border-[var(--border)] bg-[var(--bg)]">
       <SidebarHeader className="py-6 px-4">
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-7 h-7 bg-[var(--teal)] rounded flex items-center justify-center">
-            <Zap className="w-4 h-4 text-white" strokeWidth={2.5} />
-          </div>
+          <img src="/icon.png" alt="Foundry Logo" className="w-10 h-10 object-contain shrink-0" />
           <span className="font-serif text-lg text-[var(--ink)] italic">
             Foundry
           </span>

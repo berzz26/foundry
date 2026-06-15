@@ -386,9 +386,7 @@ export default function LandingPage() {
           <div className="flex flex-col md:flex-row justify-between gap-12 mb-14">
             <div className="max-w-xs">
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-6 h-6 bg-[var(--teal)] rounded flex items-center justify-center">
-                  <Zap className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />
-                </div>
+                <img src="/logo.png" alt="Foundry Logo" className="w-6 h-6 object-contain shrink-0" />
                 <span className="font-serif italic text-lg text-[var(--ink)]">Foundry Jobs</span>
               </div>
               <p className="text-sm text-[var(--ink-3)] leading-relaxed">

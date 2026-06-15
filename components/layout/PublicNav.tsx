@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { Zap, Menu, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { Dock, DockIcon } from '@/components/ui/dock';
 
 const NAV_LINKS = [
@@ -32,9 +32,7 @@ export default function PublicNav() {
       >
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 pl-1">
-          <div className="w-7 h-7 bg-[var(--teal)] rounded flex items-center justify-center shrink-0">
-            <Zap className="w-4 h-4 text-white" strokeWidth={2.5} />
-          </div>
+          <img src="/icon.png" alt="Foundry Logo" className="w-10 h-10 object-contain shrink-0" />
           <span className="font-serif italic text-lg text-[var(--ink)]">Foundry</span>
         </Link>
 
