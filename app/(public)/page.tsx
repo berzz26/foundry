@@ -6,6 +6,7 @@ import { ArrowRight, Briefcase, Building2, FileSearch, Users, Zap, Star, Trendin
 import { AnimatedCounter, SectionReveal } from '@/components/animations';
 import { AnimatedBackground } from '@/components/animations/AnimatedBackground';
 import { DottedGlowBackground } from '@/components/ui/dotted-glow-background';
+import { Highlighter } from '@/components/ui/highlighter';
 import { useState, useEffect } from 'react';
 import { getCompanies } from '@/lib/services/api';
 import type { Company } from '@/types/company';
@@ -109,7 +110,7 @@ export default function LandingPage() {
           transition={{ duration: 0.8, delay: 0.2, ease: 'easeOut' }}
           className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-[80px] leading-[1.02] tracking-tight max-w-4xl text-[var(--ink)]"
         >
-          Find Startup Jobs<br />
+          Find <Highlighter action="highlight" color="rgba(13, 115, 119, 0.2)" multiline={false} delay={1100}>Startup Jobs</Highlighter><br />
           <em className="text-[var(--teal)]">Before Everyone Else</em>
         </motion.h1>
 
