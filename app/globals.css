@@ -59,14 +59,16 @@ body {
 }
 
 /* ─── Typography ─────────────────────────────────────────────────────────────── */
-.font-serif { font-family: var(--font-serif); }
-.font-mono { font-family: var(--font-mono); }
+@layer base {
+  .font-serif { font-family: var(--font-serif); }
+  .font-mono { font-family: var(--font-mono); }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-serif);
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-  color: var(--ink);
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-serif);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
 }
 
 /* ─── Scrollbar ──────────────────────────────────────────────────────────────── */

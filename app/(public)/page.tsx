@@ -415,7 +415,7 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-6 border-t border-[var(--border)] text-xs text-[var(--ink-4)]">
-            <span>© 2024 Foundry. All rights reserved.</span>
+            <span>© 2026 Foundry. All rights reserved.</span>
             <span>Built for engineers, by engineers.</span>
           </div>
         </div>
