@@ -158,7 +158,7 @@ export default function JobsPage() {
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
         <p className="text-sm text-[var(--ink-3)] mt-0.5">
-          {filtered.length} job{filtered.length !== 1 ? 's' : ''} found
+          {data?.pagination.total} job{data?.pagination.total !== 1 ? 's' : ''} found
         </p>
       </motion.div>
 
