@@ -24,7 +24,7 @@ export interface Company {
   location: string;
   remoteFriendly: boolean;
   techStack: string[];
-  openJobsCount: number;
+  openRoles: number;
   founders: Founder[];
   hiringDescription?: string;
   employeeCount?: string;

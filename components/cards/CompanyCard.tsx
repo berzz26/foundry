@@ -62,7 +62,7 @@ export default function CompanyCard({ company }: CompanyCardProps) {
         </div>
         <div className="flex items-center gap-1">
           <Briefcase className="w-3 h-3" />
-          <span>{company.openJobsCount} open role{company.openJobsCount !== 1 ? 's' : ''}</span>
+          <span>{company.openRoles} open role{company.openRoles !== 1 ? 's' : ''}</span>
         </div>
         {company.remoteFriendly && (
           <span className="px-2 py-0.5 rounded-full border border-emerald-200 text-emerald-700 bg-emerald-50 font-medium">

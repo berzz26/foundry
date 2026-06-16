@@ -294,7 +294,7 @@ export default function LandingPage() {
                       <span className="text-xs font-mono text-[var(--ink-4)]">{company.batch || company.stage}</span>
                       <span className="flex items-center gap-1 text-xs text-[var(--teal)]">
                         <Briefcase className="w-3 h-3" />
-                        {company.openJobsCount} roles
+                        {company.openRoles} roles
                       </span>
                     </div>
                   </div>

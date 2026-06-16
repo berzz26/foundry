@@ -103,7 +103,7 @@ function mapApiCompanyToCompany(c: any): Company {
     location: c.location || 'San Francisco, CA',
     remoteFriendly: c.location?.toLowerCase().includes('remote') || (numId % 2 === 0),
     techStack: parseTechStack(c.techStack),
-    openJobsCount: c.openJobsCount || 0,
+    openRoles: c.openRoles || 0,
     founders,
     hiringDescription: c.hiringDescription || undefined,
     employeeCount: c.teamSize ? String(c.teamSize) : '1-10',

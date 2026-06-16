@@ -203,7 +203,7 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
             <div className="flex flex-col gap-3">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-[var(--ink-3)] flex items-center gap-1.5"><Briefcase className="w-3.5 h-3.5" /> Open Roles</span>
-                <span className="font-semibold text-[var(--ink)]">{company.openJobsCount}</span>
+                <span className="font-semibold text-[var(--ink)]">{openJobs.length}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-[var(--ink-3)] flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> Team Size</span>
