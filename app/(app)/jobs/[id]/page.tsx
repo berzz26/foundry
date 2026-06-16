@@ -13,6 +13,7 @@ import { getCompanyById } from '@/lib/services/api';
 import { formatSalary, timeAgo, cn } from '@/lib/utils';
 import { useBookmarkStore } from '@/lib/store/bookmarks';
 import type { Company, Founder } from '@/types/company';
+import { Markdown } from '@/components/ui/Markdown';
 
 
 
@@ -139,13 +140,13 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
           {/* About Role */}
           {job.description && (
             <motion.section className="card-double-border p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
-              <h2 className="font-serif text-xl text-[var(--ink)] mb-4">About this role</h2>
-              <p className="text-sm text-[var(--ink-2)] leading-relaxed">{job.description}</p>
+              <h2 className="font-serif text-xl text-[var(--ink)] mb-4">Details</h2>
+              <Markdown content={job.description} />
             </motion.section>
           )}
 
           {/* Responsibilities */}
-          {job.responsibilities && job.responsibilities.length > 0 && (
+          {job.responsibilities && job.responsibilities.length > 0 && !job.description?.toLowerCase().includes('responsibilit') && (
             <motion.section className="card-double-border p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}>
               <h2 className="font-serif text-xl text-[var(--ink)] mb-4">Responsibilities</h2>
               <ul className="flex flex-col gap-2.5">
@@ -160,7 +161,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
           )}
 
           {/* Requirements */}
-          {job.requirements && job.requirements.length > 0 && (
+          {job.requirements && job.requirements.length > 0 && !job.description?.toLowerCase().includes('requirement') && (
             <motion.section className="card-double-border p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
               <h2 className="font-serif text-xl text-[var(--ink)] mb-4">Requirements</h2>
               <ul className="flex flex-col gap-2.5">

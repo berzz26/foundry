@@ -10,6 +10,7 @@ import JobCard from '@/components/cards/JobCard';
 import { StaggerContainer, StaggerItem } from '@/components/animations';
 import type { Company } from '@/types/company';
 import type { Job } from '@/types/job';
+import { Markdown } from '@/components/ui/Markdown';
 
 const STAGE_LABELS: Record<string, string> = {
   'pre-seed': 'Pre-seed', seed: 'Seed', 'series-a': 'Series A',
@@ -122,14 +123,14 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
           {/* About */}
           <motion.section className="card-double-border p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
             <h2 className="font-serif text-xl text-[var(--ink)] mb-4">About {company.name}</h2>
-            <p className="text-sm text-[var(--ink-2)] leading-relaxed">{company.description}</p>
+            <Markdown content={company.description} />
           </motion.section>
 
           {/* Hiring */}
           {company.hiringDescription && (
             <motion.section className="card-double-border p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}>
               <h2 className="font-serif text-xl text-[var(--ink)] mb-4">How we hire</h2>
-              <p className="text-sm text-[var(--ink-2)] leading-relaxed">{company.hiringDescription}</p>
+              <Markdown content={company.hiringDescription} />
             </motion.section>
           )}
 
