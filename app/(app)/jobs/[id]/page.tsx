@@ -56,15 +56,19 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
           >
             <div className="flex items-start justify-between gap-4 mb-4">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded bg-[var(--teal-light)] border border-[var(--border)] flex items-center justify-center overflow-hidden">
-                  {job.company.logoUrl ? (
-                    <img src={job.company.logoUrl} alt={job.company.name} className="w-full h-full object-cover" />
-                  ) : (
+                {job.company.logoUrl ? (
+                  <img
+                    src={job.company.logoUrl}
+                    alt={job.company.name}
+                    className="w-12 h-12 rounded object-contain shrink-0"
+                  />
+                ) : (
+                  <div className="w-12 h-12 rounded bg-[var(--teal-light)] border border-[var(--border)] flex items-center justify-center shrink-0">
                     <span className="font-serif italic text-[var(--teal)] text-xl font-bold">
                       {job.company.name.charAt(0)}
                     </span>
-                  )}
-                </div>
+                  </div>
+                )}
                 <div>
                   <h1 className="font-serif text-2xl text-[var(--ink)] leading-tight">{job.title}</h1>
                   <div className="flex items-center gap-2 mt-1 flex-wrap">

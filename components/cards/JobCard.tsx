@@ -60,15 +60,23 @@ export default function JobCard({ job, compact = false }: JobCardProps) {
             >
               {/* Modal Header */}
               <div className="p-6 md:p-8 border-b border-[var(--border)] relative flex items-start gap-4 shrink-0 bg-[var(--bg-alt)]">
-                <motion.div layoutId={`logo-${job.id}`} className="w-16 h-16 md:w-20 md:h-20 rounded-xl bg-[var(--teal-light)] border border-[var(--border)] flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
-                  {job.company.logoUrl ? (
-                    <img src={job.company.logoUrl} alt={job.company.name} className="w-full h-full object-cover" />
-                  ) : (
+                {job.company.logoUrl ? (
+                  <motion.img
+                    layoutId={`logo-${job.id}`}
+                    src={job.company.logoUrl}
+                    alt={job.company.name}
+                    className="w-16 h-16 md:w-20 md:h-20 rounded-xl object-contain shrink-0"
+                  />
+                ) : (
+                  <motion.div
+                    layoutId={`logo-${job.id}`}
+                    className="w-16 h-16 md:w-20 md:h-20 rounded-xl bg-[var(--teal-light)] border border-[var(--border)] flex items-center justify-center shrink-0 shadow-sm"
+                  >
                     <span className="font-serif italic text-[var(--teal)] text-3xl font-bold">
                       {job.company.name.charAt(0)}
                     </span>
-                  )}
-                </motion.div>
+                  </motion.div>
+                )}
                 
                 <div className="flex-1 pt-1 pr-6">
                   <motion.h3 layoutId={`title-${job.id}`} className="font-serif text-xl md:text-2xl text-[var(--ink)] mb-2 leading-tight">
@@ -102,15 +110,19 @@ export default function JobCard({ job, compact = false }: JobCardProps) {
                  <div className="mb-6 bg-[var(--bg-alt)] border border-[var(--border)] rounded-2xl p-4 md:p-5 flex flex-col gap-4">
                    <div className="flex items-center justify-between border-b border-[var(--border)] pb-3">
                      <div className="flex items-center gap-3">
-                       <div className="w-10 h-10 rounded-lg bg-[var(--teal-light)] border border-[var(--border)] flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
-                         {job.company.logoUrl ? (
-                           <img src={job.company.logoUrl} alt={job.company.name} className="w-full h-full object-cover" />
-                         ) : (
-                           <span className="font-serif italic text-[var(--teal)] text-base font-bold">
-                             {job.company.name.charAt(0)}
-                           </span>
-                         )}
-                       </div>
+                        {job.company.logoUrl ? (
+                          <img
+                            src={job.company.logoUrl}
+                            alt={job.company.name}
+                            className="w-10 h-10 rounded-lg object-contain shrink-0"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 rounded-lg bg-[var(--teal-light)] border border-[var(--border)] flex items-center justify-center shrink-0 shadow-sm">
+                            <span className="font-serif italic text-[var(--teal)] text-base font-bold">
+                              {job.company.name.charAt(0)}
+                            </span>
+                          </div>
+                        )}
                        <div>
                          <Link 
                            href={`/companies/${job.company.id}`}
@@ -199,16 +211,23 @@ export default function JobCard({ job, compact = false }: JobCardProps) {
         {/* Header */}
         <div className="flex items-start justify-between gap-3 mb-3">
           <div className="flex items-center gap-3 min-w-0">
-            {/* Company logo */}
-            <motion.div layoutId={`logo-${job.id}`} className="w-9 h-9 rounded bg-[var(--teal-light)] border border-[var(--border)] flex items-center justify-center shrink-0 overflow-hidden">
-              {job.company.logoUrl ? (
-                <img src={job.company.logoUrl} alt={job.company.name} className="w-full h-full object-cover" />
-              ) : (
+            {job.company.logoUrl ? (
+              <motion.img
+                layoutId={`logo-${job.id}`}
+                src={job.company.logoUrl}
+                alt={job.company.name}
+                className="w-10 h-10 rounded object-contain shrink-0"
+              />
+            ) : (
+              <motion.div
+                layoutId={`logo-${job.id}`}
+                className="w-10 h-10 rounded bg-[var(--teal-light)] border border-[var(--border)] flex items-center justify-center shrink-0"
+              >
                 <span className="font-serif italic text-[var(--teal)] text-sm font-bold">
                   {job.company.name.charAt(0)}
                 </span>
-              )}
-            </motion.div>
+              </motion.div>
+            )}
             <div className="min-w-0">
               <motion.div layoutId={`title-${job.id}`}>
                 <Link

@@ -64,13 +64,17 @@ export default function BookmarksPage() {
               >
                 <div className="flex items-start gap-4 flex-wrap">
                   {/* Company logo */}
-                  <div className="w-10 h-10 rounded bg-[var(--teal-light)] border border-[var(--border)] flex items-center justify-center shrink-0 overflow-hidden">
-                    {job.company.logoUrl ? (
-                      <img src={job.company.logoUrl} alt={job.company.name} className="w-full h-full object-cover" />
-                    ) : (
+                  {job.company.logoUrl ? (
+                    <img
+                      src={job.company.logoUrl}
+                      alt={job.company.name}
+                      className="w-10 h-10 rounded object-contain shrink-0"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded bg-[var(--teal-light)] border border-[var(--border)] flex items-center justify-center shrink-0">
                       <span className="font-serif italic text-[var(--teal)] font-bold">{job.company.name.charAt(0)}</span>
-                    )}
-                  </div>
+                    </div>
+                  )}
 
                   {/* Content */}
                   <div className="flex-1 min-w-0">
