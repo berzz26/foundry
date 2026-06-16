@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { MapPin, Bookmark, ExternalLink, Zap, X } from 'lucide-react';
 import type { Job } from '@/types/job';
-import { formatSalary, timeAgo, cn } from '@/lib/utils';
+import { formatSalary, cn } from '@/lib/utils';
 import { useBookmarkStore } from '@/lib/store/bookmarks';
 import { useState, useRef, useEffect } from 'react';
 import { useOutsideClick } from '@/hooks/use-outside-click';
@@ -312,7 +312,6 @@ export default function JobCard({ job, compact = false }: JobCardProps) {
           {salary && (
             <span className="text-xs font-mono text-[var(--ink-2)] font-medium">{salary}</span>
           )}
-          <span className="text-xs text-[var(--ink-4)] ml-auto">{timeAgo(job.createdAt)}</span>
         </div>
 
         {/* Tech Stack */}

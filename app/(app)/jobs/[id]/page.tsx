@@ -108,7 +108,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                 </span>
               )}
               {salary && <span className="text-sm font-mono text-[var(--ink-2)] font-medium">{salary}</span>}
-              <span className="text-xs text-[var(--ink-4)] ml-auto">{timeAgo(job.createdAt)}</span>
+              {/* <span className="text-xs text-[var(--ink-4)] ml-auto">{timeAgo(job.createdAt)}</span> */}
             </div>
 
             {/* Tech Stack */}
