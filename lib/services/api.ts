@@ -211,6 +211,7 @@ export interface CompaniesMeta {
   batches: string[];
   industries: string[];
   stages: string[];
+  totalCompanies: number;
 }
 
 export async function getCompaniesMeta(): Promise<CompaniesMeta | null> {

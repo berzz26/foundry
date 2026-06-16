@@ -162,7 +162,14 @@ export default function CompaniesPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-        <h1 className="font-serif text-4xl text-[var(--ink)] tracking-tight mb-2">Companies</h1>
+        <div className="flex items-center gap-3 mb-2">
+          <h1 className="font-serif text-4xl text-[var(--ink)] tracking-tight">Companies</h1>
+          {meta?.totalCompanies !== undefined && (
+            <span className="text-xs font-mono font-bold text-[var(--teal)] px-2.5 py-1 bg-[var(--teal-light)] border border-[rgba(13,115,119,0.15)] rounded-full">
+              {meta.totalCompanies.toLocaleString()} Total
+            </span>
+          )}
+        </div>
         <p className="text-[var(--ink-3)]">Discover and filter top startups.</p>
       </motion.div>
 
@@ -286,7 +293,7 @@ export default function CompaniesPage() {
         <>
           <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {companies.map(company => (
-              <StaggerItem key={company.id}>
+              <StaggerItem key={company.id} className="h-full">
                 <CompanyCard company={company} />
               </StaggerItem>
             ))}

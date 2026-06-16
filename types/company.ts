@@ -31,6 +31,13 @@ export interface Company {
   foundedYear?: number;
 }
 
+export interface CompaniesMeta {
+  batches: string[];
+  industries: string[];
+  stages: string[];
+  totalCompanies: number;
+}
+
 export interface CompanyFilters {
   search?: string;
   batch?: string[];

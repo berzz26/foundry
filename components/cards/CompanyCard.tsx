@@ -21,7 +21,7 @@ interface CompanyCardProps {
 export default function CompanyCard({ company }: CompanyCardProps) {
   return (
     <motion.article
-      className="card-double-border p-5 group flex flex-col"
+      className="card-double-border p-5 group flex flex-col h-full"
       whileHover={{ y: -2 }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
     >
@@ -50,7 +50,7 @@ export default function CompanyCard({ company }: CompanyCardProps) {
       </div>
 
       {/* Tagline */}
-      <p className="text-sm text-[var(--ink-2)] leading-relaxed mb-3 line-clamp-2 flex-1">
+      <p className="text-sm text-[var(--ink-2)] leading-relaxed mb-3 line-clamp-2">
         {company.tagline}
       </p>
 
@@ -80,6 +80,9 @@ export default function CompanyCard({ company }: CompanyCardProps) {
           <span className="tech-badge text-[var(--ink-4)]">+{company.techStack.length - 4}</span>
         )}
       </div>
+
+      {/* Spacer to align buttons at bottom */}
+      <div className="flex-1" />
 
       {/* Actions */}
       <div className="flex items-center gap-2">
