@@ -1,8 +1,11 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { User, MapPin, Globe, Mail, Edit2, Code2, Briefcase } from 'lucide-react';
+import { User as UserIcon, MapPin, Globe, Mail, Edit2, Code2, Briefcase } from 'lucide-react';
 import { SectionReveal } from '@/components/animations';
+import { useAuth } from '@/lib/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 const PROFILE = {
   name: 'Alex Engineer',
@@ -24,17 +27,43 @@ const PROFILE = {
 };
 
 export default function ProfilePage() {
+  const { user, isLoading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.push('/login');
+    }
+  }, [isLoading, user, router]);
+
+  if (isLoading || !user) {
+    return <div className="p-6 text-center text-[var(--ink-3)]">Loading profile...</div>;
+  }
+
+  const displayName = user.firstName 
+    ? `${user.firstName} ${user.lastName || ''}`.trim() 
+    : user.email.split('@')[0];
+
   return (
     <div className="max-w-3xl mx-auto space-y-5">
       {/* Profile Card */}
       <motion.div className="card-double-border p-6" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
         <div className="flex items-start justify-between gap-4 mb-5">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-[var(--teal)] flex items-center justify-center text-white text-2xl font-semibold shrink-0">
-              {PROFILE.name.split(' ').map(n => n[0]).join('')}
-            </div>
+            {user.profileImageUrl ? (
+              <img src={user.profileImageUrl} alt={displayName} className="w-16 h-16 rounded-full object-cover shrink-0 border border-[var(--border)]" />
+            ) : (
+              <div className="w-16 h-16 rounded-full bg-[var(--teal)] flex items-center justify-center text-white text-2xl font-semibold shrink-0">
+                {displayName[0].toUpperCase()}
+              </div>
+            )}
             <div>
-              <h2 className="font-serif text-2xl text-[var(--ink)]">{PROFILE.name}</h2>
+              <div className="flex items-center gap-3">
+                <h2 className="font-serif text-2xl text-[var(--ink)]">{displayName}</h2>
+                <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest bg-[var(--bg-alt)] border border-[var(--border)] rounded-full text-[var(--ink-3)]">
+                  {user.role}
+                </span>
+              </div>
               <div className="flex items-center gap-3 mt-1 flex-wrap">
                 <div className="flex items-center gap-1 text-sm text-[var(--ink-3)]">
                   <MapPin className="w-3.5 h-3.5" />
@@ -93,7 +122,7 @@ export default function ProfilePage() {
       <SectionReveal delay={0.15}>
         <div className="card-double-border p-6">
           <div className="flex items-center gap-2 mb-4">
-            <User className="w-4 h-4 text-[var(--teal)]" />
+            <UserIcon className="w-4 h-4 text-[var(--teal)]" />
             <h3 className="font-serif text-lg text-[var(--ink)]">Job Preferences</h3>
           </div>
           <div className="grid grid-cols-2 gap-4">
@@ -119,7 +148,8 @@ export default function ProfilePage() {
             <Mail className="w-4 h-4 text-[var(--teal)]" />
             <h3 className="font-serif text-lg text-[var(--ink)]">Contact</h3>
           </div>
-          <p className="text-sm text-[var(--ink-2)]">{PROFILE.email}</p>
+          <p className="text-sm text-[var(--ink-2)]">{user.email}</p>
+          <p className="text-xs text-[var(--ink-4)] mt-2">Provider: <span className="capitalize">{user.provider}</span></p>
           {/* NOTE: TODO(security) When auth is added, mask email display in non-owner views */}
         </div>
       </SectionReveal>

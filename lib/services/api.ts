@@ -1,8 +1,21 @@
 import axios from 'axios';
 import type { Job, JobFilters, Stage } from '@/types/job';
 import type { Company, CompanyFilters, Founder } from '@/types/company';
+import type { User } from '@/types/user';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1';
+
+axios.defaults.withCredentials = true;
+
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+      console.warn('API returned 401/403:', error.response.data);
+    }
+    return Promise.reject(error);
+  }
+);
 
 const MOCK_FOUNDERS: Founder[] = [
   { id: 'f1', name: 'Arjun Mehta', role: 'CEO & Co-founder', linkedin: 'https://linkedin.com', twitter: 'https://twitter.com' },
@@ -272,4 +285,61 @@ export async function getResumeMatches(): Promise<ResumeMatchResult> {
     topSkills: ['TypeScript', 'Go', 'Distributed Systems', 'PostgreSQL', 'React'],
     matchedJobs: matched,
   };
+}
+
+// ─── Auth ────────────────────────────────────────────────────────────────────
+
+export async function login(email: string, password: string): Promise<{ token: string; user: User }> {
+  const res = await axios.post(`${API_BASE_URL}/auth/login`, { email, password });
+  return res.data;
+}
+
+export async function signup(userData: Partial<User> & { password?: string }): Promise<User> {
+  const res = await axios.post(`${API_BASE_URL}/auth/signup`, userData);
+  return res.data;
+}
+
+export async function logout(): Promise<void> {
+  await axios.post(`${API_BASE_URL}/auth/logout`);
+}
+
+export async function getMe(): Promise<User | null> {
+  try {
+    const res = await axios.get(`${API_BASE_URL}/auth/me`);
+    return res.data;
+  } catch (error) {
+    return null;
+  }
+}
+
+// ─── Founders ────────────────────────────────────────────────────────────────
+
+export async function getFounders(): Promise<Founder[]> {
+  try {
+    const res = await axios.get(`${API_BASE_URL}/founders`);
+    return res.data.founders || res.data;
+  } catch (error) {
+    console.error('getFounders error:', error);
+    return [];
+  }
+}
+
+export async function getFoundersByCompanyId(companyId: string): Promise<Founder[]> {
+  try {
+    const res = await axios.get(`${API_BASE_URL}/founders/company/${companyId}`);
+    return res.data.founders || res.data;
+  } catch (error) {
+    console.error(`getFoundersByCompanyId(${companyId}) error:`, error);
+    return [];
+  }
+}
+
+export async function getFounderById(id: string): Promise<Founder | null> {
+  try {
+    const res = await axios.get(`${API_BASE_URL}/founders/${id}`);
+    return res.data;
+  } catch (error) {
+    console.error(`getFounderById(${id}) error:`, error);
+    return null;
+  }
 }

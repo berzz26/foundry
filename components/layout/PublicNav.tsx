@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 import { Dock, DockIcon } from '@/components/ui/dock';
+import { useAuth } from '@/lib/contexts/AuthContext';
 
 const NAV_LINKS = [
   { href: '/jobs', label: 'Jobs' },
@@ -14,6 +15,7 @@ const NAV_LINKS = [
 export default function PublicNav() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -72,7 +74,20 @@ export default function PublicNav() {
             </DockIcon>
           </Dock>
 
-         
+          {user ? (
+            <Link href="/dashboard" className="px-4 py-2 rounded-full bg-[var(--ink)] text-white text-sm font-medium hover:bg-[var(--ink-2)] transition-colors">
+              Dashboard
+            </Link>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Link href="/login" className="px-3 py-2 text-sm font-medium text-[var(--ink-2)] hover:text-[var(--teal)] transition-colors">
+                Login
+              </Link>
+              <Link href="/signup" className="px-4 py-2 rounded-full bg-[var(--ink)] text-white text-sm font-medium hover:bg-[var(--ink-2)] transition-colors shadow-sm">
+                Sign Up
+              </Link>
+            </div>
+          )}
         </div>
 
         {/* Mobile menu toggle */}

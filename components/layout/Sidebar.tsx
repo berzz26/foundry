@@ -9,6 +9,7 @@ import {
   FileText,
   Bookmark,
   User,
+  LogOut,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -22,6 +23,7 @@ import {
   SidebarGroupLabel,
   SidebarGroupContent,
 } from '@/components/ui/sidebar';
+import { useAuth } from '@/lib/contexts/AuthContext';
 
 const NAV_ITEMS = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -34,6 +36,7 @@ const NAV_ITEMS = [
 
 export default function AppSidebar() {
   const pathname = usePathname();
+  const { user, logout } = useAuth();
 
   return (
     <Sidebar className="border-r border-[var(--border)] bg-[var(--bg)]">
@@ -72,11 +75,20 @@ export default function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="p-4 border-t border-[var(--border)]">
+      <SidebarFooter className="p-4 border-t border-[var(--border)] flex flex-col gap-3">
         <div className="px-3 py-2 rounded-md bg-[var(--teal-light)] border border-[rgba(13,115,119,0.12)]">
           <p className="text-[11px] font-semibold text-[var(--teal)] mb-0.5">Coming in V2</p>
           <p className="text-[11px] text-[var(--ink-3)]">Outreach, Founder CRM, and Cold Email Generator</p>
         </div>
+        {user && (
+          <button 
+            onClick={() => logout()}
+            className="flex items-center gap-2 text-sm text-[var(--ink-3)] hover:text-red-500 transition-colors px-2 py-1"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>Logout</span>
+          </button>
+        )}
       </SidebarFooter>
     </Sidebar>
   );

@@ -15,9 +15,13 @@ export interface Company {
   name: string;
   tagline: string;
   description: string;
+  companyDescription?: string;
   logo?: string;
   smallLogoUrl?: string;
   website?: string;
+  twitterUrl?: string;
+  linkedinUrl?: string;
+  facebookUrl?: string;
   stage: Stage;
   batch?: string;
   industry: string;

@@ -2,7 +2,9 @@
 
 import { Bell, Search } from 'lucide-react';
 import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 import { SidebarTrigger } from '@/components/ui/sidebar';
+import { useAuth } from '@/lib/contexts/AuthContext';
 
 const PAGE_TITLES: Record<string, string> = {
   '/dashboard': 'Dashboard',
@@ -15,6 +17,7 @@ const PAGE_TITLES: Record<string, string> = {
 
 export default function TopNav() {
   const pathname = usePathname();
+  const { user } = useAuth();
   const title = PAGE_TITLES[pathname] ?? 'Foundry Jobs';
 
   return (
@@ -42,9 +45,19 @@ export default function TopNav() {
         >
           <Bell className="w-4 h-4" />
         </button>
-        <div className="w-8 h-8 rounded-full bg-[var(--teal)] flex items-center justify-center text-white text-sm font-semibold">
-          A
-        </div>
+        {user ? (
+          <Link href="/profile" className="w-8 h-8 rounded-full bg-[var(--teal)] flex items-center justify-center text-white text-sm font-semibold hover:opacity-80 transition-opacity">
+            {user.profileImageUrl ? (
+              <img src={user.profileImageUrl} alt="Avatar" className="w-8 h-8 rounded-full object-cover" />
+            ) : (
+              (user.firstName?.[0] || user.email[0]).toUpperCase()
+            )}
+          </Link>
+        ) : (
+          <Link href="/login" className="text-sm font-medium text-[var(--ink-2)] hover:text-[var(--teal)] px-2 transition-colors">
+            Login
+          </Link>
+        )}
       </div>
     </header>
   );

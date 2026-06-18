@@ -5,6 +5,8 @@ import { useState } from 'react';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { SearchCommand } from '@/components/search/SearchCommand';
 
+import { AuthProvider } from '@/lib/contexts/AuthContext';
+
 export default function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
     () =>
@@ -20,10 +22,12 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        {children}
-        <SearchCommand />
-      </TooltipProvider>
+      <AuthProvider>
+        <TooltipProvider>
+          {children}
+          <SearchCommand />
+        </TooltipProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
