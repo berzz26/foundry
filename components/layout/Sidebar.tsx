@@ -10,6 +10,7 @@ import {
   Bookmark,
   User,
   LogOut,
+  Users,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -29,6 +30,7 @@ const NAV_ITEMS = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/jobs', label: 'Jobs', icon: Briefcase },
   { href: '/companies', label: 'Companies', icon: Building2 },
+  { href: '/founders', label: 'Founders', icon: Users },
   { href: '/resume-match', label: 'Resume Match', icon: FileText },
   { href: '/bookmarks', label: 'Bookmarks', icon: Bookmark },
   { href: '/profile', label: 'Profile', icon: User },

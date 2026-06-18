@@ -11,6 +11,8 @@ import { StaggerContainer, StaggerItem } from '@/components/animations';
 import type { Company } from '@/types/company';
 import type { Job } from '@/types/job';
 import { Markdown } from '@/components/ui/Markdown';
+import { cn } from '@/lib/utils';
+import { useAuth } from '@/lib/contexts/AuthContext';
 
 const STAGE_LABELS: Record<string, string> = {
   'pre-seed': 'Pre-seed', seed: 'Seed', 'series-a': 'Series A',
@@ -22,6 +24,7 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
   const [company, setCompany] = useState<Company | null>(null);
   const [openJobs, setOpenJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
   useEffect(() => {
     async function loadData() {
@@ -168,7 +171,7 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
 
         {/* Sidebar: Founders */}
         <div className="flex flex-col gap-5">
-          <motion.section className="card-double-border p-5" initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.15 }}>
+          <motion.section className={cn("card-double-border p-5", !user && "opacity-40 blur-[4px] pointer-events-none select-none grayscale-[20%]")} initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.15 }}>
             <h2 className="font-serif text-lg text-[var(--ink)] mb-4">Founders</h2>
             <div className="flex flex-col gap-4">
               {company.founders.map(f => (

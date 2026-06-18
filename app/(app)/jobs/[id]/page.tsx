@@ -14,12 +14,14 @@ import { formatSalary, timeAgo, cn } from '@/lib/utils';
 import { useBookmarkStore } from '@/lib/store/bookmarks';
 import type { Company, Founder } from '@/types/company';
 import { Markdown } from '@/components/ui/Markdown';
+import { useAuth } from '@/lib/contexts/AuthContext';
 
 
 
 export default function JobDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const { data: job, isLoading } = useJob(id);
+  const { user } = useAuth();
 
   const [company, setCompany] = useState<Company | null>(null);
 
@@ -212,7 +214,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
 
           {/* Founders */}
           {company && company.founders.length > 0 && (
-            <motion.div className="card-double-border p-5" initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}>
+            <motion.div className={cn("card-double-border p-5", !user && "opacity-40 blur-[4px] pointer-events-none select-none grayscale-[20%]")} initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}>
               <h2 className="font-serif text-lg text-[var(--ink)] mb-4">Founders</h2>
               <div className="flex flex-col gap-3">
                 {company.founders.map((f: Founder) => (
