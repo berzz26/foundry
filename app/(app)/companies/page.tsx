@@ -7,6 +7,7 @@ import CompanyCard from '@/components/cards/CompanyCard';
 import { CompanyCardSkeleton } from '@/components/skeletons';
 import { getCompanies, getCompaniesMeta, CompaniesMeta } from '@/lib/services/api';
 import { StaggerContainer, StaggerItem } from '@/components/animations';
+import { LockedResultsOverlay } from '@/components/ui/LockedResultsOverlay';
 import { cn } from '@/lib/utils';
 import type { Stage } from '@/types/job';
 import type { Company } from '@/types/company';
@@ -159,6 +160,8 @@ export default function CompaniesPage() {
   const toggle = <T extends string>(arr: T[], val: T, set: (a: T[]) => void) =>
     set(arr.includes(val) ? arr.filter(v => v !== val) : [...arr, val]);
 
+  const hitLimit = !hasMore && meta && companies.length < meta.totalCompanies;
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
@@ -298,7 +301,7 @@ export default function CompaniesPage() {
               </StaggerItem>
             ))}
           </StaggerContainer>
-          {hasMore && (
+          {hasMore && !hitLimit && (
             <div ref={lastElementRef} className="flex justify-center py-8">
               {loadingMore && (
                 <div className="flex items-center gap-2 text-[var(--teal)] text-sm font-medium">
@@ -308,6 +311,7 @@ export default function CompaniesPage() {
               )}
             </div>
           )}
+          {hitLimit && <LockedResultsOverlay type="companies" />}
         </>
       )}
     </div>

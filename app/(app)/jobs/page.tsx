@@ -8,6 +8,7 @@ import { JobCardSkeleton } from '@/components/skeletons';
 import { useJobs } from '@/lib/hooks/useJobs';
 import { StaggerContainer, StaggerItem } from '@/components/animations';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { LockedResultsOverlay } from '@/components/ui/LockedResultsOverlay';
 import { cn } from '@/lib/utils';
 import type { LocationType, Stage } from '@/types/job';
 
@@ -152,6 +153,7 @@ export default function JobsPage() {
   }, [filters, jobs]);
 
   const activeFilterCount = filters.locationTypes.length + filters.stages.length + filters.industries.length + filters.techStack.length;
+  const hitLimit = !!data && data.jobs.length < data.pagination.total;
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -232,13 +234,16 @@ export default function JobsPage() {
               <p className="text-sm text-[var(--ink-3)]">Try adjusting your search or filters</p>
             </div>
           ) : (
-            <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {filtered.map(job => (
-                <StaggerItem key={job.id}>
-                  <JobCard job={job} />
-                </StaggerItem>
-              ))}
-            </StaggerContainer>
+            <>
+              <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {filtered.map(job => (
+                  <StaggerItem key={job.id}>
+                    <JobCard job={job} />
+                  </StaggerItem>
+                ))}
+              </StaggerContainer>
+              {hitLimit && <LockedResultsOverlay type="jobs" />}
+            </>
           )}
         </div>
       </div>
