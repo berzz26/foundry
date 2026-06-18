@@ -38,10 +38,10 @@ export default function FoundersPage() {
         {founders.map(f => (
           <StaggerItem key={f.id} className="card-double-border p-5 flex items-center gap-4 bg-[var(--bg)]">
             <div className="w-12 h-12 rounded-full bg-[var(--teal)] flex items-center justify-center text-white text-lg font-semibold shrink-0">
-              {f.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+              {(f.name || '?').split(' ').filter(Boolean).map(n => n[0]).join('').slice(0, 2).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-base font-medium text-[var(--ink)] truncate">{f.name}</p>
+              <p className="text-base font-medium text-[var(--ink)] truncate">{f.name || 'Unknown Founder'}</p>
               <p className="text-sm text-[var(--ink-3)] truncate">{f.role}</p>
             </div>
             <div className="flex gap-2">

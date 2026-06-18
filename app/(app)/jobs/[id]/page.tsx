@@ -220,10 +220,10 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                 {company.founders.map((f: Founder) => (
                   <div key={f.id} className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-full bg-[var(--teal)] flex items-center justify-center text-white text-sm font-semibold shrink-0">
-                      {f.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
+                      {(f.name || '?').split(' ').filter(Boolean).map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-[var(--ink)] truncate">{f.name}</p>
+                      <p className="text-sm font-medium text-[var(--ink)] truncate">{f.name || 'Unknown Founder'}</p>
                       <p className="text-xs text-[var(--ink-3)] truncate">{f.role}</p>
                     </div>
                     <div className="flex gap-1.5">
