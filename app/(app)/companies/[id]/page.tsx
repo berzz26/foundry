@@ -5,7 +5,7 @@ import { use, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Globe, MapPin, Users, Link2, ExternalLink as TwitterIcon, ArrowRight, Briefcase } from 'lucide-react';
-import { getCompanyById, getJobsByCompanyId } from '@/lib/services/api';
+import { getCompanyById, getJobsByCompanyId, getFoundersByCompanyId } from '@/lib/services/api';
 import JobCard from '@/components/cards/JobCard';
 import { StaggerContainer, StaggerItem } from '@/components/animations';
 import type { Company } from '@/types/company';
@@ -31,7 +31,8 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
       try {
         const comp = await getCompanyById(id);
         if (comp) {
-          setCompany(comp);
+          const founders = await getFoundersByCompanyId(id);
+          setCompany({ ...comp, founders });
           const jobs = await getJobsByCompanyId(id);
           setOpenJobs(jobs);
         }
@@ -176,11 +177,15 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
             <div className="flex flex-col gap-4">
               {company.founders.map(f => (
                 <div key={f.id} className="flex items-center gap-3 group">
-                  <div className="w-10 h-10 rounded-full bg-[var(--teal)] flex items-center justify-center text-white text-sm font-semibold shrink-0">
-                    {(f.name || '?').split(' ').filter(Boolean).map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+                  <div className="w-10 h-10 rounded-full bg-[var(--teal)] flex items-center justify-center text-white text-sm font-semibold shrink-0 overflow-hidden">
+                    {(f.avatarThumb || f.avatarUrl || f.avatar) ? (
+                      <img src={f.avatarThumb || f.avatarUrl || f.avatar} alt={f.fullName || f.name || ''} className="w-full h-full object-cover" />
+                    ) : (
+                      (f.fullName || f.name || '?').split(' ').filter(Boolean).map(n => n[0]).join('').slice(0, 2).toUpperCase()
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-[var(--ink)]">{f.name || 'Unknown Founder'}</p>
+                    <p className="text-sm font-medium text-[var(--ink)]">{f.fullName || f.name || 'Unknown Founder'}</p>
                     <p className="text-xs text-[var(--ink-3)]">{f.role}</p>
                   </div>
                   <div className="flex gap-2">

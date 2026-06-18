@@ -1,13 +1,17 @@
 import type { Stage } from './job';
 
 export interface Founder {
-  id: string;
-  name: string;
-  role: string;
+  id: string | number;
+  name?: string; // from mock
+  fullName?: string; // from API
+  firstName?: string;
+  lastName?: string;
+  role?: string;
   avatar?: string;
+  avatarUrl?: string;
+  avatarThumb?: string;
   linkedin?: string;
   twitter?: string;
-  // NOTE: email intentionally omitted in V1
 }
 
 export interface Company {

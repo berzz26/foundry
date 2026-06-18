@@ -9,7 +9,7 @@ import {
   CheckCircle2, Briefcase, Zap,
 } from 'lucide-react';
 import { useJob } from '@/lib/hooks/useJobs';
-import { getCompanyById } from '@/lib/services/api';
+import { getCompanyById, getFoundersByCompanyId } from '@/lib/services/api';
 import { formatSalary, timeAgo, cn } from '@/lib/utils';
 import { useBookmarkStore } from '@/lib/store/bookmarks';
 import type { Company, Founder } from '@/types/company';
@@ -27,9 +27,18 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
 
   useEffect(() => {
     if (job?.company?.id) {
-      getCompanyById(job.company.id.toString())
-        .then(res => setCompany(res))
-        .catch(console.error);
+      const fetchCompanyAndFounders = async () => {
+        try {
+          const res = await getCompanyById(job.company.id.toString());
+          if (res) {
+            const founders = await getFoundersByCompanyId(job.company.id.toString());
+            setCompany({ ...res, founders });
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      };
+      fetchCompanyAndFounders();
     }
   }, [job?.company?.id]);
 
@@ -219,11 +228,15 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
               <div className="flex flex-col gap-3">
                 {company.founders.map((f: Founder) => (
                   <div key={f.id} className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-[var(--teal)] flex items-center justify-center text-white text-sm font-semibold shrink-0">
-                      {(f.name || '?').split(' ').filter(Boolean).map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()}
+                    <div className="w-9 h-9 rounded-full bg-[var(--teal)] flex items-center justify-center text-white text-sm font-semibold shrink-0 overflow-hidden">
+                      {(f.avatarThumb || f.avatarUrl || f.avatar) ? (
+                        <img src={f.avatarThumb || f.avatarUrl || f.avatar} alt={f.fullName || f.name || ''} className="w-full h-full object-cover" />
+                      ) : (
+                        (f.fullName || f.name || '?').split(' ').filter(Boolean).map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-[var(--ink)] truncate">{f.name || 'Unknown Founder'}</p>
+                      <p className="text-sm font-medium text-[var(--ink)] truncate">{f.fullName || f.name || 'Unknown Founder'}</p>
                       <p className="text-xs text-[var(--ink-3)] truncate">{f.role}</p>
                     </div>
                     <div className="flex gap-1.5">
