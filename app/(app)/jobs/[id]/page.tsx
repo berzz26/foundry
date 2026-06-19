@@ -202,9 +202,9 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                   ...(company.batch ? [{ label: 'Batch', value: company.batch }] : []),
                   ...(company.employeeCount ? [{ label: 'Team size', value: company.employeeCount }] : []),
                 ].map(({ label, value }) => (
-                  <div key={label} className="flex items-center justify-between text-sm border-b border-[var(--border)] pb-2 last:border-0 last:pb-0">
-                    <span className="text-[var(--ink-4)] text-xs uppercase tracking-wide">{label}</span>
-                    <span className="text-[var(--ink-2)] font-medium capitalize">{value}</span>
+                  <div key={label} className="flex items-start justify-between gap-4 text-sm border-b border-[var(--border)] pb-2 last:border-0 last:pb-0">
+                    <span className="text-[var(--ink-4)] text-xs uppercase tracking-wide shrink-0 pt-0.5">{label}</span>
+                    <span className="text-[var(--ink-2)] font-medium capitalize text-right min-w-0">{value}</span>
                   </div>
                 ))}
               </div>

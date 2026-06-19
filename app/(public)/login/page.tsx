@@ -113,7 +113,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <div className="mt-6 grid grid-cols-2 gap-3">
+            <div className="mt-6 grid grid-cols-1 gap-3">
               <a
                 href={`${API_BASE_URL}/auth/google/login`}
                 className="inline-flex w-full items-center justify-center rounded-md border border-[var(--border)] bg-transparent py-2 px-4 text-sm font-medium text-[var(--ink-2)] shadow-sm hover:bg-[var(--bg-alt)] hover:text-[var(--ink)] transition-colors"
