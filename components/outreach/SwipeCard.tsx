@@ -10,6 +10,7 @@ import { ComposeDM } from './ComposeDM';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card } from '@/components/ui/card';
 import { CopyButton } from '@/components/ui/CopyButton';
+import { Markdown } from '@/components/ui/Markdown';
 
 interface SwipeCardProps {
   card: DeckCard;
@@ -28,6 +29,7 @@ export function SwipeCard({ card, isActive, onSwipeLeft, onSwipeRight }: SwipeCa
   const opacity = useTransform(x, [-300, -150, 0, 150, 300], [0, 1, 1, 1, 0]);
 
   const [aboutExpanded, setAboutExpanded] = useState(false);
+  const [roleExpanded, setRoleExpanded] = useState(false);
   const cardKey = `${card.outreachId}`;
 
   const handleDragEnd = async (e: any, info: PanInfo) => {
@@ -209,6 +211,20 @@ export function SwipeCard({ card, isActive, onSwipeLeft, onSwipeRight }: SwipeCa
                     {card.job.skills.length > 5 && <Badge variant="outline" className="text-[10px] py-0">+{card.job.skills.length - 5}</Badge>}
                   </div>
                 )}
+
+                {card.job.description && (
+                  <div className={`mt-3 ${roleExpanded ? '' : 'line-clamp-4'}`}>
+                    <Markdown content={card.job.description} />
+                    {card.job.description.length > 300 && (
+                      <button
+                        onClick={() => setRoleExpanded(!roleExpanded)}
+                        className="text-primary text-xs font-medium mt-1 hover:underline"
+                      >
+                        {roleExpanded ? 'Read less' : 'Read more'}
+                      </button>
+                    )}
+                  </div>
+                )}
                 
                 {card.job.jobUrl && (
                   <a href={`/jobs/${card.job.id}`} target="_blank" rel="noreferrer" className="text-xs text-primary hover:underline flex items-center gap-1 inline-flex mt-2">
@@ -264,7 +280,9 @@ export function SwipeCard({ card, isActive, onSwipeLeft, onSwipeRight }: SwipeCa
 
                 {f.founder.bio && (
                   <div className="flex items-start justify-between gap-2">
-                    <p className="text-sm text-foreground/80 line-clamp-3 flex-1">{f.founder.bio}</p>
+                    <div className="text-sm text-foreground/80 line-clamp-3 flex-1">
+                      <Markdown content={f.founder.bio} />
+                    </div>
                     <CopyButton
                       text={f.founder.bio}
                       className="-mr-1 mt-0.5 text-muted-foreground hover:text-foreground"
@@ -295,9 +313,9 @@ export function SwipeCard({ card, isActive, onSwipeLeft, onSwipeRight }: SwipeCa
                   <p className="text-xs text-muted-foreground font-medium mb-1 line-clamp-1">
                     Subject: {f.outreach.subject}
                   </p>
-                  <p className="text-sm font-sans italic text-foreground/80 line-clamp-2">
-                    &ldquo;{f.outreach.message}&rdquo;
-                  </p>
+                  <div className="text-sm text-foreground/80 line-clamp-2 pointer-events-none">
+                    <Markdown content={f.outreach.message ?? ''} />
+                  </div>
                   <div className="relative flex justify-end gap-1 pt-1.5">
                     <CopyButton
                       text={f.outreach.subject ? `Subject: ${f.outreach.subject}\n\n${f.outreach.message ?? ''}` : (f.outreach.message ?? '')}
