@@ -10,7 +10,7 @@ export type SwipeCard = {
   company: {
     id: number; name: string; batch?: string | null; tagline?: string | null;
     description?: string | null; hiringDescription?: string | null;
-    logoUrl?: string | null; website?: string | null; location?: string | null;
+    logoUrl?: string | null; smallLogoUrl?: string | null; website?: string | null; location?: string | null;
     industry?: string | null; stage?: string | null; teamSize?: number | null;
     isHiring: boolean;
   };

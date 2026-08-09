@@ -220,14 +220,17 @@ export function SwipeDeck() {
             >
               {/* Company header */}
               <div className="p-4 border-b border-[var(--border)] bg-[var(--bg-alt)] flex items-start gap-3">
-                <Avatar className="w-11 h-11 rounded-xl border border-[var(--border)] shrink-0">
-                  {card.company.logoUrl && (
-                    <AvatarImage src={card.company.logoUrl} alt={card.company.name} className="object-cover" />
-                  )}
-                  <AvatarFallback className="rounded-xl text-sm font-bold bg-[var(--teal-light)] text-[var(--teal)]">
-                    {card.company.name.substring(0, 2).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
+              {card.company.smallLogoUrl || card.company.logoUrl ? (
+                <img
+                  src={card.company.smallLogoUrl || card.company.logoUrl}
+                  alt={card.company.name}
+                  className="w-10 h-10 rounded object-contain shrink-0"
+                />
+              ) : (
+                <span className="w-10 h-10 flex items-center justify-center text-sm font-bold text-[var(--teal)] shrink-0">
+                  {card.company.name.substring(0, 2).toUpperCase()}
+                </span>
+              )}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5 flex-wrap">
                     <h3 className="font-semibold text-[var(--ink)] text-sm leading-tight truncate">
@@ -326,7 +329,9 @@ export function SwipeDeck() {
                     </div>
                     {f.founder.bio && (
                       <div className="flex items-start justify-between gap-2">
-                        <p className="text-xs text-[var(--ink-4)] leading-snug line-clamp-4 flex-1">{f.founder.bio}</p>
+                        <div className="text-xs text-[var(--ink-4)] leading-snug line-clamp-4 flex-1">
+                          <Markdown content={f.founder.bio} />
+                        </div>
                         <CopyButton
                           text={f.founder.bio}
                           className="-mt-0.5 text-[var(--ink-4)] hover:text-[var(--teal)]"
@@ -334,9 +339,9 @@ export function SwipeDeck() {
                       </div>
                     )}
                     <div className="flex items-start justify-between gap-2">
-                      <p className="text-xs text-[var(--ink-3)] italic line-clamp-2 border-l-2 border-[var(--border)] pl-2 flex-1">
-                        &ldquo;{f.outreach.message}&rdquo;
-                      </p>
+                      <div className="text-xs text-[var(--ink-3)] leading-snug line-clamp-3 border-l-2 border-[var(--border)] pl-2 flex-1">
+                        <Markdown content={f.outreach.message ?? ''} />
+                      </div>
                       <CopyButton
                         text={f.outreach.message ?? ''}
                         className="text-[var(--ink-4)] hover:text-[var(--teal)]"

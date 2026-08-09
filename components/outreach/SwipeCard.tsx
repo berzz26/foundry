@@ -59,7 +59,7 @@ export function SwipeCard({ card, isActive, onSwipeLeft, onSwipeRight }: SwipeCa
   };
 
   // Company logo placeholder or URL
-  const companyLogo = card.company.logoUrl || null;
+  const companyLogo = card.company.smallLogoUrl || card.company.logoUrl || null;
   const founderAvatar = (f: FounderRecipient) => f.founder.avatarUrl || null;
 
   // Format currency
@@ -94,12 +94,17 @@ export function SwipeCard({ card, isActive, onSwipeLeft, onSwipeRight }: SwipeCa
           {/* 1. Company Section */}
           <div className="p-6 border-b border-border bg-muted/10 shrink-0">
             <div className="flex items-start gap-4 mb-4">
-              <Avatar className="w-16 h-16 rounded-xl border border-border">
-                {companyLogo && <AvatarImage src={companyLogo} alt={card.company.name} className="object-cover" />}
-                <AvatarFallback className="rounded-xl text-lg font-bold">
+              {companyLogo ? (
+                <img
+                  src={companyLogo}
+                  alt={card.company.name}
+                  className="w-14 h-14 rounded object-contain shrink-0"
+                />
+              ) : (
+                <span className="w-14 h-14 flex items-center justify-center text-lg font-bold shrink-0">
                   {card.company.name.substring(0, 2).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
+                </span>
+              )}
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                   <h2 className="text-xl font-bold">{card.company.name}</h2>
