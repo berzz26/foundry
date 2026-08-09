@@ -4,19 +4,20 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { SwipeCard, sendOutreachMessage } from '@/lib/api/outreach';
+import { DeckCard, FounderRecipient, sendOutreachMessage } from '@/lib/api/outreach';
 import { Send, X, Loader2, AlertCircle, CheckCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface ComposeDMProps {
-  card: SwipeCard;
+  card: DeckCard;
+  founder: FounderRecipient;
   onClose: () => void;
   onSent: () => void;
 }
 
-export function ComposeDM({ card, onClose, onSent }: ComposeDMProps) {
-  const [subject, setSubject] = useState(card.outreach.subject || '');
-  const [message, setMessage] = useState(card.outreach.message || '');
+export function ComposeDM({ card, founder, onClose, onSent }: ComposeDMProps) {
+  const [subject, setSubject] = useState(founder.outreach.subject || '');
+  const [message, setMessage] = useState(founder.outreach.message || '');
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMode, setSuccessMode] = useState<string | null>(null);
@@ -35,7 +36,7 @@ export function ComposeDM({ card, onClose, onSent }: ComposeDMProps) {
       const response = await sendOutreachMessage(card.outreachId, {
         subject,
         message,
-        founderId: card.founderId,
+        founderId: founder.founderId,
       });
       
       setSuccessMode(response.mode === 'dry-run' ? 'dry-run' : 'sent');
@@ -68,8 +69,8 @@ export function ComposeDM({ card, onClose, onSent }: ComposeDMProps) {
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium text-muted-foreground">To</label>
           <div className="px-3 py-2 bg-muted/50 rounded-md border border-border/50 text-sm">
-            <span className="font-medium text-foreground">{card.founder.fullName}</span>{' '}
-            <span className="text-muted-foreground">&lt;{card.email.address}&gt;</span>
+            <span className="font-medium text-foreground">{founder.founder.fullName}</span>{' '}
+            <span className="text-muted-foreground">&lt;{founder.email.address}&gt;</span>
           </div>
         </div>
 

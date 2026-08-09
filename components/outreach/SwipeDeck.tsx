@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { getOutreachCards, SwipeCard as SwipeCardType } from '@/lib/api/outreach';
+import { getOutreachCards, DeckCard, FounderRecipient, groupOutreachCards } from '@/lib/api/outreach';
 import { SwipeCard } from './SwipeCard';
 import { ComposeDM } from './ComposeDM';
 import {
@@ -18,7 +18,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 export function SwipeDeck() {
   const [viewMode, setViewMode] = useState<'deck' | 'list'>('deck');
-  const [cards, setCards] = useState<SwipeCardType[]>([]);
+  const [cards, setCards] = useState<DeckCard[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +32,7 @@ export function SwipeDeck() {
   const limit = 10;
 
   // For list view compose modal
-  const [composeCard, setComposeCard] = useState<SwipeCardType | null>(null);
+  const [compose, setCompose] = useState<{ card: DeckCard; founder: FounderRecipient } | null>(null);
 
   const fetchCards = useCallback(async (reset = false) => {
     try {
@@ -45,24 +45,27 @@ export function SwipeDeck() {
       setError(null);
       
       const res = await getOutreachCards(limit, currentOffset, undefined, search, hasJob ? true : undefined);
-      
-      const dedupe = (list: SwipeCardType[]) => {
-        const seen = new Set<number>();
-        return list.filter(c => {
-          if (seen.has(c.outreachId)) return false;
-          seen.add(c.outreachId);
-          return true;
-        });
+      const grouped = groupOutreachCards(res.cards);
+
+      const merge = (prev: DeckCard[]) => {
+        const map = new Map<number, DeckCard>(prev.map(c => [c.outreachId, c]));
+        for (const inc of grouped) {
+          const cur = map.get(inc.outreachId);
+          if (!cur) {
+            map.set(inc.outreachId, inc);
+          } else {
+            const founderIds = new Set(cur.founders.map(f => f.founderId));
+            cur.founders = [...cur.founders, ...inc.founders.filter(f => !founderIds.has(f.founderId))];
+          }
+        }
+        return [...map.values()];
       };
 
       if (reset) {
-        setCards(dedupe(res.cards));
+        setCards(merge([]));
         setCurrentIndex(0);
       } else {
-        setCards(prev => {
-          const seen = new Set(prev.map(c => c.outreachId));
-          return [...prev, ...dedupe(res.cards).filter(c => !seen.has(c.outreachId))];
-        });
+        setCards(prev => merge(prev));
       }
       
       setOffset(res.pagination.offset + limit);
@@ -262,44 +265,55 @@ export function SwipeDeck() {
                 )}
               </div>
 
-              {/* Founder */}
-              <div className="px-4 py-3 flex items-center gap-3 flex-1">
-                <Avatar className="w-9 h-9 border border-[var(--border)] shrink-0">
-                  {card.founder.avatarUrl && (
-                    <AvatarImage src={card.founder.avatarUrl} alt={card.founder.fullName} className="object-cover" />
-                  )}
-                  <AvatarFallback className="text-xs font-semibold">
-                    {card.founder.firstName?.[0]}{card.founder.lastName?.[0]}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold text-[var(--ink)] truncate">{card.founder.fullName}</p>
-                  {card.founder.bio && (
-                    <p className="text-xs text-[var(--ink-4)] truncate">{card.founder.bio.split('.')[0]}</p>
-                  )}
-                </div>
-                {card.founder.linkedin && (
-                  <a
-                    href={card.founder.linkedin}
-                    target="_blank"
-                    rel="noreferrer"
-                    onClick={e => e.stopPropagation()}
-                    className="shrink-0 p-1.5 rounded-full text-[var(--ink-4)] hover:text-[#0A66C2] hover:bg-[var(--bg-alt)] transition-colors"
-                  >
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
-                )}
-              </div>
-
-              {/* Action */}
-              <div className="px-4 pb-4">
-                <button
-                  onClick={() => setComposeCard(card)}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold bg-[var(--ink)] text-white hover:bg-[var(--teal)] transition-colors shadow-sm"
-                >
-                  <Mail className="w-4 h-4" />
-                  Send Message
-                </button>
+              {/* Founders */}
+              <div className="flex-1">
+                <p className="px-4 pt-3 text-xs text-[var(--ink-4)] uppercase tracking-wider font-bold flex items-center gap-1.5">
+                  <Users className="w-3 h-3" /> {card.founders.length > 1 ? 'Founders' : 'Founder'}
+                </p>
+                {card.founders.map((f) => (
+                  <div key={f.founderId} className="px-4 py-3 flex flex-col gap-2 border-t border-[var(--border)]">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="w-9 h-9 border border-[var(--border)] shrink-0">
+                        {f.founder.avatarUrl && (
+                          <AvatarImage src={f.founder.avatarUrl} alt={f.founder.fullName} className="object-cover" />
+                        )}
+                        <AvatarFallback className="text-xs font-semibold">
+                          {f.founder.firstName?.[0]}{f.founder.lastName?.[0]}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-semibold text-[var(--ink)] truncate">{f.founder.fullName}</p>
+                          <span className="text-[10px] text-[var(--ink-4)] whitespace-nowrap">{f.email.address}</span>
+                        </div>
+                        {f.founder.bio && (
+                          <p className="text-xs text-[var(--ink-4)] truncate">{f.founder.bio.split('.')[0]}</p>
+                        )}
+                      </div>
+                      {f.founder.linkedin && (
+                        <a
+                          href={f.founder.linkedin}
+                          target="_blank"
+                          rel="noreferrer"
+                          onClick={e => e.stopPropagation()}
+                          className="shrink-0 p-1.5 rounded-full text-[var(--ink-4)] hover:text-[#0A66C2] hover:bg-[var(--bg-alt)] transition-colors"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
+                      )}
+                    </div>
+                    <p className="text-xs text-[var(--ink-3)] italic line-clamp-2 border-l-2 border-[var(--border)] pl-2">
+                      "{f.outreach.message}"
+                    </p>
+                    <button
+                      onClick={() => setCompose({ card, founder: f })}
+                      className="w-full flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-semibold bg-[var(--ink)] text-white hover:bg-[var(--teal)] transition-colors shadow-sm"
+                    >
+                      <Mail className="w-3.5 h-3.5" />
+                      Customize & Send DM
+                    </button>
+                  </div>
+                ))}
               </div>
             </div>
           ))}
@@ -314,7 +328,7 @@ export function SwipeDeck() {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-64px)] overflow-hidden">
+    <div className="relative flex flex-col h-[calc(100vh-64px)] overflow-hidden">
       {/* Filter / Control Bar */}
       <div className="px-4 py-3 border-b border-[var(--border)] bg-[var(--bg-alt)]/80 backdrop-blur-sm flex items-center gap-3 shrink-0">
         {/* View toggle */}
@@ -409,11 +423,12 @@ export function SwipeDeck() {
       </div>
 
       {/* List view compose modal */}
-      {composeCard && (
+      {compose && (
         <ComposeDM
-          card={composeCard}
-          onClose={() => setComposeCard(null)}
-          onSent={() => setComposeCard(null)}
+          card={compose.card}
+          founder={compose.founder}
+          onClose={() => setCompose(null)}
+          onSent={() => setCompose(null)}
         />
       )}
     </div>

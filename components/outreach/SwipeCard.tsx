@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, useMotionValue, useTransform, useAnimation, PanInfo } from 'framer-motion';
-import { SwipeCard as SwipeCardType } from '@/lib/api/outreach';
+import { DeckCard, FounderRecipient } from '@/lib/api/outreach';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { MapPin, Users, Building, ExternalLink, Briefcase, Mail, AlertCircle } from 'lucide-react';
@@ -11,7 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card } from '@/components/ui/card';
 
 interface SwipeCardProps {
-  card: SwipeCardType;
+  card: DeckCard;
   isActive: boolean;
   onSwipeLeft: (cardId: string) => void;
   onSwipeRight: (cardId: string) => void;
@@ -20,14 +20,14 @@ interface SwipeCardProps {
 export function SwipeCard({ card, isActive, onSwipeLeft, onSwipeRight }: SwipeCardProps) {
   const x = useMotionValue(0);
   const controls = useAnimation();
-  const [showCompose, setShowCompose] = useState(false);
+  const [composeFounder, setComposeFounder] = useState<FounderRecipient | null>(null);
   
   // Tie rotation and opacity to the drag distance (x)
   const rotate = useTransform(x, [-200, 200], [-10, 10]);
   const opacity = useTransform(x, [-300, -150, 0, 150, 300], [0, 1, 1, 1, 0]);
 
   const [aboutExpanded, setAboutExpanded] = useState(false);
-  const cardKey = `${card.outreachId}-${card.founderId}`;
+  const cardKey = `${card.outreachId}`;
 
   const handleDragEnd = async (e: any, info: PanInfo) => {
     const threshold = 120;
@@ -46,18 +46,18 @@ export function SwipeCard({ card, isActive, onSwipeLeft, onSwipeRight }: SwipeCa
   };
 
   const handleComposeClose = () => {
-    setShowCompose(false);
+    setComposeFounder(null);
     // User cancelled sending. They can swipe again.
   };
 
   const handleSent = () => {
-    setShowCompose(false);
+    setComposeFounder(null);
     onSwipeRight(cardKey);
   };
 
   // Company logo placeholder or URL
   const companyLogo = card.company.logoUrl || null;
-  const founderAvatar = card.founder.avatarUrl || null;
+  const founderAvatar = (f: FounderRecipient) => f.founder.avatarUrl || null;
 
   // Format currency
   const formatSalary = (min?: number | null, max?: number | null) => {
@@ -81,7 +81,7 @@ export function SwipeCard({ card, isActive, onSwipeLeft, onSwipeRight }: SwipeCa
       <motion.div
         className="relative w-full max-w-[420px] md:max-w-4xl h-[750px] max-h-[85vh] md:h-[650px] bg-card rounded-3xl shadow-2xl border border-border flex flex-col md:flex-row overflow-hidden pointer-events-auto"
         style={{ x, rotate, opacity }}
-        drag={isActive && !showCompose ? "x" : false}
+        drag={isActive && !composeFounder ? "x" : false}
         dragConstraints={{ left: 0, right: 0 }}
         dragElastic={0.6}
         onDragEnd={handleDragEnd}
@@ -210,75 +210,78 @@ export function SwipeCard({ card, isActive, onSwipeLeft, onSwipeRight }: SwipeCa
 
         {/* Right side panel for desktop */}
         <div className="w-full md:w-[400px] flex flex-col shrink-0 bg-card">
-          {/* 3. Founder Section */}
-          <div className="flex-1 overflow-y-auto p-6 pb-[180px] md:pb-6">
-             <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
-                <Users className="w-4 h-4" /> Founder
-             </h3>
-             <div className="flex items-start gap-4">
-                <Avatar className="w-14 h-14 border border-border">
-                  {founderAvatar && <AvatarImage src={founderAvatar} alt={card.founder.fullName} className="object-cover" />}
-                  <AvatarFallback>{card.founder.firstName?.[0]}{card.founder.lastName?.[0]}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-semibold text-lg">{card.founder.fullName}</h4>
-                      <p className="text-xs text-primary">{card.founder.bio?.split('.')[0] || 'Founder'}</p>
+          {/* 3. Founders Section */}
+          <div className="flex-1 overflow-y-auto p-6 space-y-4">
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+              <Users className="w-4 h-4" /> {card.founders.length > 1 ? 'Founders' : 'Founder'}
+            </h3>
+            {card.founders.map((f) => (
+              <div key={f.founderId} className="border border-border rounded-2xl bg-muted/10 p-4 flex flex-col gap-3">
+                <div className="flex items-start gap-3">
+                  <Avatar className="w-12 h-12 border border-border shrink-0">
+                    {founderAvatar(f) && <AvatarImage src={founderAvatar(f)!} alt={f.founder.fullName} className="object-cover" />}
+                    <AvatarFallback>{f.founder.firstName?.[0]}{f.founder.lastName?.[0]}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <h4 className="font-semibold text-lg truncate">{f.founder.fullName}</h4>
+                      <div className="flex gap-1 shrink-0">
+                        {f.founder.linkedin && (
+                          <a href={f.founder.linkedin} target="_blank" rel="noreferrer" className="p-1.5 bg-muted rounded-full hover:bg-muted/80 text-muted-foreground hover:text-[#0A66C2] transition-colors">
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </a>
+                        )}
+                        {f.founder.twitter && (
+                          <a href={f.founder.twitter} target="_blank" rel="noreferrer" className="p-1.5 bg-muted rounded-full hover:bg-muted/80 text-muted-foreground hover:text-[#1DA1F2] transition-colors">
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </a>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex gap-1">
-                      {card.founder.linkedin && (
-                        <a href={card.founder.linkedin} target="_blank" rel="noreferrer" className="p-1.5 bg-muted rounded-full hover:bg-muted/80 text-muted-foreground hover:text-[#0A66C2] transition-colors">
-                          <ExternalLink className="w-4 h-4" />
-                        </a>
-                      )}
-                      {card.founder.twitter && (
-                        <a href={card.founder.twitter} target="_blank" rel="noreferrer" className="p-1.5 bg-muted rounded-full hover:bg-muted/80 text-muted-foreground hover:text-[#1DA1F2] transition-colors">
-                          <ExternalLink className="w-4 h-4" />
-                        </a>
-                      )}
-                    </div>
+                    {f.founder.bio && (
+                      <p className="text-xs text-muted-foreground truncate">{f.founder.bio.split('.')[0]}</p>
+                    )}
                   </div>
-                  {card.founder.bio && (
-                    <p className="text-sm text-foreground/80 mt-2 line-clamp-4">
-                      {card.founder.bio}
-                    </p>
+                </div>
+
+                {f.founder.bio && (
+                  <p className="text-sm text-foreground/80 line-clamp-3">{f.founder.bio}</p>
+                )}
+
+                <div className="flex items-center gap-2 text-xs">
+                  <div className="flex items-center gap-1.5 bg-muted/60 px-2 py-1 rounded-full border border-border/50 max-w-full overflow-hidden">
+                    <Mail className="w-3.5 h-3.5 flex-shrink-0 text-muted-foreground" />
+                    <span className="truncate font-medium">{f.email.address}</span>
+                    {renderDot(f.email.smtpValid)}
+                  </div>
+                  {f.email.confidence && (
+                    <span className="text-muted-foreground whitespace-nowrap">{f.email.confidence}% match</span>
                   )}
                 </div>
-             </div>
-          </div>
 
-          {/* 4. Footer */}
-          <div className="absolute md:relative bottom-0 left-0 right-0 md:bottom-auto bg-background/95 md:bg-transparent backdrop-blur-md border-t border-border p-5 md:mt-auto shrink-0 z-10">
-          <div className="flex items-center gap-2 mb-3 px-1 text-xs">
-            <div className="flex items-center gap-1.5 bg-muted/60 px-2 py-1 rounded-full border border-border/50 max-w-full overflow-hidden">
-              <Mail className="w-3.5 h-3.5 flex-shrink-0 text-muted-foreground" />
-              <span className="truncate font-medium">{card.email.address}</span>
-              {renderDot(card.email.smtpValid)}
-            </div>
-            {card.email.confidence && (
-              <span className="text-muted-foreground">{card.email.confidence}% match</span>
-            )}
+                <div
+                  className="bg-muted/50 rounded-xl p-3 border border-border/50 relative overflow-hidden group cursor-pointer"
+                  onClick={() => setComposeFounder(f)}
+                >
+                  <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <p className="text-xs text-muted-foreground font-medium mb-1 line-clamp-1">
+                    Subject: {f.outreach.subject}
+                  </p>
+                  <p className="text-sm font-sans italic text-foreground/80 line-clamp-2">
+                    &ldquo;{f.outreach.message}&rdquo;
+                  </p>
+                </div>
+
+                <Button className="w-full font-semibold rounded-xl" size="lg" onClick={() => setComposeFounder(f)}>
+                  Edit & Send
+                </Button>
+              </div>
+            ))}
           </div>
-          
-          <div className="bg-muted/50 rounded-xl p-3 border border-border/50 mb-3 relative overflow-hidden group cursor-pointer" onClick={() => setShowCompose(true)}>
-            <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-            <p className="text-xs text-muted-foreground font-medium mb-1 line-clamp-1">
-              Subject: {card.outreach.subject}
-            </p>
-            <p className="text-sm font-sans italic text-foreground/80 line-clamp-2">
-              "{card.outreach.message}"
-            </p>
-          </div>
-          
-          <Button className="w-full font-semibold rounded-xl mt-2" size="lg" onClick={() => setShowCompose(true)}>
-            Edit & Send
-          </Button>
-        </div>
         </div>
 
-        {showCompose && (
-          <ComposeDM card={card} onClose={handleComposeClose} onSent={handleSent} />
+        {composeFounder && (
+          <ComposeDM card={card} founder={composeFounder} onClose={handleComposeClose} onSent={handleSent} />
         )}
       </motion.div>
     </motion.div>
