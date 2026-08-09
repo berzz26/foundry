@@ -6,6 +6,7 @@ import { Search, SlidersHorizontal, X } from 'lucide-react';
 import JobCard from '@/components/cards/JobCard';
 import { JobCardSkeleton } from '@/components/skeletons';
 import { useJobs } from '@/lib/hooks/useJobs';
+import { useSavedJobs } from '@/lib/hooks/useSavedJobs';
 import { StaggerContainer, StaggerItem } from '@/components/animations';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { LockedResultsOverlay } from '@/components/ui/LockedResultsOverlay';
@@ -129,6 +130,7 @@ export default function JobsPage() {
     search: '', locationTypes: [], stages: [], industries: [], techStack: [],
   });
   const { data, isLoading } = useJobs({ limit: 50 }); // Fetch more for local filtering if needed
+  useSavedJobs(); // Sync saved-job ids for bookmark buttons
   const jobs = useMemo(() => data?.jobs || [], [data?.jobs]);
 
   const filtered = useMemo(() => {

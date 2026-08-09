@@ -3,8 +3,8 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Bookmark, Trash2, ExternalLink, MapPin, Calendar } from 'lucide-react';
+import { useSavedJobs, useUnsaveJob } from '@/lib/hooks/useSavedJobs';
 import { useBookmarkStore } from '@/lib/store/bookmarks';
-import { useJobs } from '@/lib/hooks/useJobs';
 import { formatSalary, timeAgo, cn } from '@/lib/utils';
 
 const STATUS_OPTIONS = ['Interested', 'Applied', 'Interviewing', 'Offer', 'Rejected'];
@@ -18,11 +18,11 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default function BookmarksPage() {
-  const { bookmarked, statuses, savedDates, toggle, setStatus } = useBookmarkStore();
+  const { statuses, setStatus } = useBookmarkStore();
+  const { data, isLoading } = useSavedJobs();
+  const unsaveMutation = useUnsaveJob();
 
-  const { data, isLoading } = useJobs({ limit: 100 });
-  const jobs = data?.jobs || [];
-  const savedJobs = jobs.filter(j => bookmarked.includes(j.id.toString()));
+  const savedJobs = data || [];
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -32,7 +32,7 @@ export default function BookmarksPage() {
 
       {isLoading ? (
         <div className="card-double-border p-20 flex flex-col items-center justify-center text-center">
-          <p className="text-sm text-[var(--ink-3)]">Loading bookmarks...</p>
+          <p className="text-sm text-[var(--ink-3)]">Loading saved jobs...</p>
         </div>
       ) : savedJobs.length === 0 ? (
         <motion.div
@@ -42,7 +42,7 @@ export default function BookmarksPage() {
         >
           <Bookmark className="w-12 h-12 text-[var(--ink-4)] mb-4" />
           <h3 className="font-serif text-2xl text-[var(--ink)] mb-2">No saved jobs yet</h3>
-          <p className="text-sm text-[var(--ink-3)] mb-6">Bookmark jobs as you browse to track them here.</p>
+          <p className="text-sm text-[var(--ink-3)] mb-6">Save jobs as you browse to track them here.</p>
           <Link href="/jobs" className="flex items-center gap-2 px-5 py-2.5 bg-[var(--ink)] text-white text-sm font-medium rounded hover:bg-[var(--teal)] transition-colors">
             Browse Jobs
           </Link>
@@ -51,12 +51,11 @@ export default function BookmarksPage() {
         <div className="flex flex-col gap-3">
           {savedJobs.map((job, i) => {
             const salary = formatSalary(job.salary?.min, job.salary?.max, job.salary?.currency);
-            const savedDate = savedDates[job.id.toString()];
-            const status = statuses[job.id.toString()] ?? 'Interested';
+            const status = statuses[String(job.id)] ?? 'Interested';
 
             return (
               <motion.div
-                key={job.id}
+                key={String(job.id)}
                 className="card-double-border p-5"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -90,7 +89,7 @@ export default function BookmarksPage() {
                       <select
                         id={`status-${job.id}`}
                         value={status}
-                        onChange={e => setStatus(job.id.toString(), e.target.value)}
+                        onChange={e => setStatus(String(job.id), e.target.value)}
                         className={cn(
                           'text-xs font-medium px-2 py-1 rounded border cursor-pointer outline-none bg-transparent',
                           STATUS_COLORS[status] ?? 'bg-[var(--bg-alt)] text-[var(--ink-2)] border-[var(--border)]'
@@ -106,10 +105,10 @@ export default function BookmarksPage() {
                         {job.location}
                       </div>
                       {salary && <span className="font-mono text-[var(--ink-2)]">{salary}</span>}
-                      {savedDate && (
+                      {job.savedAt && (
                         <div className="flex items-center gap-1">
                           <Calendar className="w-3 h-3" />
-                          Saved {timeAgo(savedDate)}
+                          Saved {timeAgo(job.savedAt)}
                         </div>
                       )}
                     </div>
@@ -125,8 +124,9 @@ export default function BookmarksPage() {
                       </Link>
                       <button
                         id={`remove-bookmark-${job.id}`}
-                        onClick={() => toggle(job.id.toString())}
-                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-[var(--border)] text-[var(--ink-3)] hover:border-rose-300 hover:text-rose-500 transition-all rounded"
+                        onClick={() => unsaveMutation.mutate(job.id)}
+                        disabled={unsaveMutation.isPending}
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-[var(--border)] text-[var(--ink-3)] hover:border-rose-300 hover:text-rose-500 transition-all rounded disabled:opacity-60"
                       >
                         <Trash2 className="w-3 h-3" />
                         Remove

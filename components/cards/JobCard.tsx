@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { MapPin, Bookmark, ExternalLink, Zap, X } from 'lucide-react';
 import type { Job } from '@/types/job';
 import { formatSalary, cn } from '@/lib/utils';
-import { useBookmarkStore } from '@/lib/store/bookmarks';
+import { useIsJobSaved, useSaveJob, useUnsaveJob } from '@/lib/hooks/useSavedJobs';
 import { useState, useRef, useEffect } from 'react';
 import { useOutsideClick } from '@/hooks/use-outside-click';
 
@@ -15,9 +15,18 @@ interface JobCardProps {
 }
 
 export default function JobCard({ job, compact = false }: JobCardProps) {
-  const { toggle, isBookmarked } = useBookmarkStore();
-  const saved = isBookmarked(job.id.toString());
+  const saved = useIsJobSaved(job.id);
+  const saveMutation = useSaveJob();
+  const unsaveMutation = useUnsaveJob();
+  const isPending = saveMutation.isPending || unsaveMutation.isPending;
   const salary = formatSalary(job.salary?.min, job.salary?.max, job.salary?.currency);
+
+  const handleToggleSave = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isPending) return;
+    if (saved) unsaveMutation.mutate(job.id);
+    else saveMutation.mutate(job.id);
+  };
 
   const [active, setActive] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -266,10 +275,11 @@ export default function JobCard({ job, compact = false }: JobCardProps) {
             )}
             <button
               id={`bookmark-${job.id}`}
-              onClick={(e) => { e.stopPropagation(); toggle(job.id.toString()); }}
+              onClick={handleToggleSave}
               aria-label={saved ? 'Remove bookmark' : 'Bookmark job'}
+              disabled={isPending}
               className={cn(
-                'w-7 h-7 flex items-center justify-center rounded border transition-all',
+                'w-7 h-7 flex items-center justify-center rounded border transition-all disabled:opacity-60',
                 saved
                   ? 'bg-[var(--teal)] border-[var(--teal)] text-white'
                   : 'border-[var(--border)] text-[var(--ink-4)] hover:border-[var(--teal)] hover:text-[var(--teal)]'
