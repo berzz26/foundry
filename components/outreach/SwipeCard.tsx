@@ -5,13 +5,13 @@ import { motion, useMotionValue, useTransform, useAnimation, PanInfo } from 'fra
 import { DeckCard, FounderRecipient } from '@/lib/api/outreach';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MapPin, Users, Building, ExternalLink, Briefcase, Mail, AlertCircle, Bookmark } from 'lucide-react';
+import { MapPin, Users, Building, ExternalLink, Briefcase, Mail, AlertCircle } from 'lucide-react';
 import { ComposeDM } from './ComposeDM';
+import { SaveJobButton } from './SaveJobButton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card } from '@/components/ui/card';
 import { CopyButton } from '@/components/ui/CopyButton';
 import { Markdown } from '@/components/ui/Markdown';
-import { useIsJobSaved, useSaveJob, useUnsaveJob } from '@/lib/hooks/useSavedJobs';
 
 interface SwipeCardProps {
   card: DeckCard;
@@ -32,17 +32,6 @@ export function SwipeCard({ card, isActive, onSwipeLeft, onSwipeRight }: SwipeCa
   const [aboutExpanded, setAboutExpanded] = useState(false);
   const [roleExpanded, setRoleExpanded] = useState(false);
   const cardKey = `${card.outreachId}`;
-
-  const isJobSaved = useIsJobSaved(card.job?.id ?? -1);
-  const saveMutation = useSaveJob();
-  const unsaveMutation = useUnsaveJob();
-  const savePending = saveMutation.isPending || unsaveMutation.isPending;
-
-  const handleToggleSave = () => {
-    if (!card.job || savePending) return;
-    if (isJobSaved) unsaveMutation.mutate(card.job.id);
-    else saveMutation.mutate(card.job.id);
-  };
 
   const handleDragEnd = async (e: any, info: PanInfo) => {
     const threshold = 120;
@@ -187,22 +176,7 @@ export function SwipeCard({ card, isActive, onSwipeLeft, onSwipeRight }: SwipeCa
                 <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
                   <Briefcase className="w-4 h-4" /> Open Role
                   <span className="flex-1" />
-                  {card.job && (
-                    <button
-                      type="button"
-                      onClick={handleToggleSave}
-                      disabled={savePending}
-                      aria-label={isJobSaved ? 'Remove from saved jobs' : 'Save job'}
-                      title={isJobSaved ? 'Saved' : 'Save job'}
-                      className={`w-7 h-7 flex items-center justify-center rounded border transition-all disabled:opacity-60 ${
-                        isJobSaved
-                          ? 'bg-[var(--teal)] border-[var(--teal)] text-white'
-                          : 'text-muted-foreground border-border hover:border-[var(--teal)] hover:text-[var(--teal)]'
-                      }`}
-                    >
-                      <Bookmark className="w-3.5 h-3.5" fill={isJobSaved ? 'currentColor' : 'none'} />
-                    </button>
-                  )}
+                  <SaveJobButton jobId={card.job?.id} className="text-muted-foreground border-border hover:border-[var(--teal)] hover:text-[var(--teal)]" />
                   <CopyButton
                     text={[
                       card.job.title,

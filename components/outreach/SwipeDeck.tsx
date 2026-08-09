@@ -7,11 +7,13 @@ import { ComposeDM } from './ComposeDM';
 import {
   Loader2, RefreshCcw, Search, Filter,
   ChevronLeft, ChevronRight, LayoutGrid, Layers, Mail,
-  Building, Users, Briefcase, ExternalLink
+  Building, Users, Briefcase, ExternalLink, Bookmark
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CopyButton } from '@/components/ui/CopyButton';
 import { Markdown } from '@/components/ui/Markdown';
+import { SaveJobButton } from './SaveJobButton';
+import { useSavedJobs } from '@/lib/hooks/useSavedJobs';
 
 
 
@@ -25,6 +27,7 @@ export function SwipeDeck() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
+  useSavedJobs(); // Sync saved-job ids for save buttons
   const [offset, setOffset] = useState(0);
   const [hasNext, setHasNext] = useState(true);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
@@ -266,9 +269,12 @@ export function SwipeDeck() {
               <div className="px-4 py-3 border-b border-[var(--border)]">
                 {card.job ? (
                   <div>
-                    <p className="text-xs text-[var(--ink-4)] uppercase tracking-wider font-bold mb-1 flex items-center gap-1.5">
-                      <Briefcase className="w-3 h-3" /> Open Role
-                    </p>
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <p className="text-xs text-[var(--ink-4)] uppercase tracking-wider font-bold flex items-center gap-1.5">
+                        <Briefcase className="w-3 h-3" /> Open Role
+                      </p>
+                      <SaveJobButton jobId={card.job.id} className="text-[var(--ink-4)] hover:text-[var(--teal)]" />
+                    </div>
                     <p className="font-semibold text-[var(--ink)] text-sm leading-snug">{card.job.title}</p>
                     <div className="flex flex-wrap gap-1.5 mt-2">
                       {card.job.skills.slice(0, 4).map((skill, idx) => (
