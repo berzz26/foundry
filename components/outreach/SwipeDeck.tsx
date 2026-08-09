@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { getOutreachCards, DeckCard, FounderRecipient, groupOutreachCards } from '@/lib/api/outreach';
 import { SwipeCard } from './SwipeCard';
 import { ComposeDM } from './ComposeDM';
@@ -26,6 +26,8 @@ export function SwipeDeck() {
   const [offset, setOffset] = useState(0);
   const [hasNext, setHasNext] = useState(true);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
+  const cardsRef = useRef<DeckCard[]>([]);
+  const noProgressCountRef = useRef(0);
   
   const [search, setSearch] = useState('');
   const [hasJob, setHasJob] = useState(false);
@@ -62,14 +64,32 @@ export function SwipeDeck() {
       };
 
       if (reset) {
-        setCards(merge([]));
+        const next = merge([]);
+        cardsRef.current = next;
+        noProgressCountRef.current = 0;
+        setCards(next);
         setCurrentIndex(0);
+        setHasNext(res.pagination.hasNext);
       } else {
-        setCards(prev => merge(prev));
+        const prev = cardsRef.current;
+        const next = merge(prev);
+        cardsRef.current = next;
+        setCards(next);
+        if (next.length > prev.length) {
+          noProgressCountRef.current = 0;
+          setHasNext(res.pagination.hasNext);
+        } else if (res.cards.length === 0) {
+          noProgressCountRef.current = 0;
+          setHasNext(false);
+        } else {
+          // Nothing new came back. Give randomization a couple of chances
+          // to yield unseen cards, then stop to avoid a request loop.
+          noProgressCountRef.current += 1;
+          setHasNext(noProgressCountRef.current >= 2 ? false : res.pagination.hasNext);
+        }
       }
-      
+
       setOffset(res.pagination.offset + limit);
-      setHasNext(res.pagination.hasNext);
     } catch (err: any) {
       console.error('Failed to fetch outreach cards:', err);
       setError('Failed to load cards. Please try again.');

@@ -54,15 +54,16 @@ export type DeckCard = {
 export function groupOutreachCards(cards: SwipeCard[]): DeckCard[] {
   const map = new Map<number, DeckCard>();
   for (const card of cards) {
-    let entry = map.get(card.outreachId);
+    const key = card.outreachId ?? card.company.id;
+    let entry = map.get(key);
     if (!entry) {
       entry = {
-        outreachId: card.outreachId,
+        outreachId: key,
         company: card.company,
         job: card.job,
         founders: [],
       };
-      map.set(card.outreachId, entry);
+      map.set(key, entry);
     }
     const existing = entry.founders.some(f => f.founderId === card.founderId);
     if (!existing) {
@@ -86,6 +87,7 @@ export type OutreachResponse = {
     offset: number;
     hasNext: boolean;
   };
+  seed?: string;
 };
 
 export async function getOutreachCards(limit: number = 10, offset: number = 0, companyId?: string, search?: string, hasJob?: boolean): Promise<OutreachResponse> {
