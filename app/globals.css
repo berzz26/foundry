@@ -81,8 +81,8 @@ body {
 .card-double-border {
   position: relative;
   background: var(--surface);
-  backdrop-filter: blur(12px);
-  transition: background 0.3s ease, box-shadow 0.3s ease;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+  will-change: transform;
 }
 
 .card-double-border::before {
@@ -107,7 +107,7 @@ body {
 
 .card-double-border:hover {
   background: var(--surface-hover);
-  box-shadow: var(--shadow-hover);
+  box-shadow: 0 8px 24px -8px rgba(14, 17, 23, 0.1);
 }
 
 .card-double-border:hover::before {
@@ -258,11 +258,11 @@ body {
 
 /* ─── Page transition ────────────────────────────────────────────────────────── */
 .page-enter {
-  animation: pageEnter 0.4s ease both;
+  animation: pageEnter 0.25s ease both;
 }
 
 @keyframes pageEnter {
-  from { opacity: 0; transform: translateY(12px); }
+  from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
 

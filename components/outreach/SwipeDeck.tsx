@@ -50,7 +50,10 @@ export function SwipeDeck() {
         setCards(res.cards);
         setCurrentIndex(0);
       } else {
-        setCards(prev => [...prev, ...res.cards]);
+        setCards(prev => {
+          const seen = new Set(prev.map(c => c.outreachId));
+          return [...prev, ...res.cards.filter(c => !seen.has(c.outreachId))];
+        });
       }
       
       setOffset(res.pagination.offset + limit);
@@ -144,7 +147,7 @@ export function SwipeDeck() {
               const distanceFromTop = arr.length - 1 - idx;
               return (
                 <motion.div
-                  key={`${card.outreachId}-${card.founderId}`}
+                  key={card.outreachId}
                   initial={{ opacity: 0, scale: 0.9, y: 50 }}
                   animate={{ 
                     opacity: 1, 
@@ -176,12 +179,9 @@ export function SwipeDeck() {
       <div id="list-scroll-container" className="w-full h-full overflow-y-auto p-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 max-w-7xl mx-auto">
           {cards.map((card) => (
-            <motion.div
-              key={`${card.outreachId}-${card.founderId}`}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.25 }}
-              className="group flex flex-col bg-[var(--bg)] border border-[var(--border)] rounded-2xl overflow-hidden hover:border-[var(--teal)] hover:shadow-lg transition-all duration-200"
+            <div
+              key={card.outreachId}
+              className="outreach-list-card group flex flex-col bg-[var(--bg)] border border-[var(--border)] rounded-2xl overflow-hidden"
             >
               {/* Company header */}
               <div className="p-4 border-b border-[var(--border)] bg-[var(--bg-alt)] flex items-start gap-3">
@@ -292,7 +292,7 @@ export function SwipeDeck() {
                   Send Message
                 </button>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
         {isFetchingMore && (
