@@ -10,6 +10,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/dashboard': 'Dashboard',
   '/jobs': 'Jobs',
   '/companies': 'Companies',
+  '/outreach': 'Outreach',
   '/resume-match': 'Resume Match',
   '/bookmarks': 'Bookmarks',
   '/profile': 'Profile',

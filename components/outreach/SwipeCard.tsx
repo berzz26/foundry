@@ -81,7 +81,7 @@ export function SwipeCard({ card, isActive, onSwipeLeft, onSwipeRight }: SwipeCa
       style={{ zIndex: isActive ? 10 : 0 }}
     >
       <motion.div
-        className="relative w-full max-w-[420px] h-[750px] max-h-[85vh] bg-card rounded-3xl shadow-2xl border border-border flex flex-col overflow-hidden pointer-events-auto"
+        className="relative w-full max-w-[420px] md:max-w-4xl h-[750px] max-h-[85vh] md:h-[650px] bg-card rounded-3xl shadow-2xl border border-border flex flex-col md:flex-row overflow-hidden pointer-events-auto"
         style={{ x, rotate, opacity }}
         drag={isActive && !showCompose ? "x" : false}
         dragConstraints={{ left: 0, right: 0 }}
@@ -89,9 +89,9 @@ export function SwipeCard({ card, isActive, onSwipeLeft, onSwipeRight }: SwipeCa
         onDragEnd={handleDragEnd}
         animate={controls}
       >
-        <div className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar pb-[100px]">
+        <div className="flex-1 overflow-y-auto no-scrollbar pb-[100px] md:pb-0 md:border-r border-border flex flex-col bg-muted/5">
           {/* 1. Company Section */}
-          <div className="p-6 border-b border-border bg-muted/20">
+          <div className="p-6 border-b border-border bg-muted/10 shrink-0">
             <div className="flex items-start gap-4 mb-4">
               <Avatar className="w-16 h-16 rounded-xl border border-border">
                 {companyLogo && <AvatarImage src={companyLogo} alt={card.company.name} className="object-cover" />}
@@ -157,7 +157,7 @@ export function SwipeCard({ card, isActive, onSwipeLeft, onSwipeRight }: SwipeCa
           </div>
 
           {/* 2. Job Section */}
-          <div className="p-6 border-b border-border">
+          <div className="p-6 shrink-0">
             {card.job ? (
               <div>
                 <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
@@ -208,9 +208,12 @@ export function SwipeCard({ card, isActive, onSwipeLeft, onSwipeRight }: SwipeCa
               </div>
             )}
           </div>
+        </div>
 
+        {/* Right side panel for desktop */}
+        <div className="w-full md:w-[400px] flex flex-col shrink-0 bg-card">
           {/* 3. Founder Section */}
-          <div className="p-6">
+          <div className="flex-1 overflow-y-auto p-6 pb-[180px] md:pb-6">
              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
                 <Users className="w-4 h-4" /> Founder
              </h3>
@@ -246,10 +249,9 @@ export function SwipeCard({ card, isActive, onSwipeLeft, onSwipeRight }: SwipeCa
                 </div>
              </div>
           </div>
-        </div>
 
-        {/* 4. Footer */}
-        <div className="absolute bottom-0 left-0 right-0 bg-background/95 backdrop-blur-md border-t border-border p-4">
+          {/* 4. Footer */}
+          <div className="absolute md:relative bottom-0 left-0 right-0 md:bottom-auto bg-background/95 md:bg-transparent backdrop-blur-md border-t border-border p-5 md:mt-auto shrink-0 z-10">
           <div className="flex items-center gap-2 mb-3 px-1 text-xs">
             <div className="flex items-center gap-1.5 bg-muted/60 px-2 py-1 rounded-full border border-border/50 max-w-full overflow-hidden">
               <Mail className="w-3.5 h-3.5 flex-shrink-0 text-muted-foreground" />
@@ -271,9 +273,10 @@ export function SwipeCard({ card, isActive, onSwipeLeft, onSwipeRight }: SwipeCa
             </p>
           </div>
           
-          <Button className="w-full font-semibold rounded-xl" size="lg" onClick={() => setShowCompose(true)}>
+          <Button className="w-full font-semibold rounded-xl mt-2" size="lg" onClick={() => setShowCompose(true)}>
             Edit & Send
           </Button>
+        </div>
         </div>
 
         {showCompose && (

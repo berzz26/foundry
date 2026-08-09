@@ -11,6 +11,7 @@ import {
   User,
   LogOut,
   Users,
+  Send,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -32,6 +33,7 @@ const NAV_ITEMS = [
   { href: '/companies', label: 'Companies', icon: Building2 },
   { href: '/founders', label: 'Founders', icon: Users },
   { href: '/resume-match', label: 'Resume Match', icon: FileText },
+  { href: '/outreach', label: 'Outreach', icon: Send },
   { href: '/bookmarks', label: 'Bookmarks', icon: Bookmark },
   { href: '/profile', label: 'Profile', icon: User },
 ];
@@ -79,8 +81,8 @@ export default function AppSidebar() {
 
       <SidebarFooter className="p-4 border-t border-[var(--border)] flex flex-col gap-3">
         <div className="px-3 py-2 rounded-md bg-[var(--teal-light)] border border-[rgba(13,115,119,0.12)]">
-          <p className="text-[11px] font-semibold text-[var(--teal)] mb-0.5">Coming in V2</p>
-          <p className="text-[11px] text-[var(--ink-3)]">Outreach, Founder CRM, and Cold Email Generator</p>
+          <p className="text-[11px] font-semibold text-[var(--teal)] mb-0.5">Foundry Core</p>
+          <p className="text-[11px] text-[var(--ink-3)]">Building the future of recruitment.</p>
         </div>
         {user && (
           <button 

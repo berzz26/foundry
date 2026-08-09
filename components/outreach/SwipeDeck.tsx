@@ -128,7 +128,7 @@ export function SwipeDeck() {
             )}
           </div>
         ) : (
-          <div className="relative w-full max-w-[420px] h-[750px] max-h-[85vh]">
+          <div className="relative w-full max-w-[420px] md:max-w-4xl h-[750px] max-h-[85vh] md:h-[650px]">
             <AnimatePresence>
               {/* Render the deck backwards so the first card is on top visually */}
               {cards.slice(0, 3).reverse().map((card, idx, arr) => {

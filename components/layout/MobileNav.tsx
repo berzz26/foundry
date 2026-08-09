@@ -2,13 +2,13 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Briefcase, Building2, FileText, Bookmark } from 'lucide-react';
+import { LayoutDashboard, Briefcase, Building2, FileText, Bookmark, Send } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const MOBILE_NAV = [
   { href: '/dashboard', label: 'Home', icon: LayoutDashboard },
   { href: '/jobs', label: 'Jobs', icon: Briefcase },
-  { href: '/companies', label: 'Companies', icon: Building2 },
+  { href: '/outreach', label: 'Outreach', icon: Send },
   { href: '/resume-match', label: 'Match', icon: FileText },
   { href: '/bookmarks', label: 'Saved', icon: Bookmark },
 ];
