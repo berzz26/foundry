@@ -337,7 +337,7 @@ export function SwipeDeck() {
                         &ldquo;{f.outreach.message}&rdquo;
                       </p>
                       <CopyButton
-                        text={f.outreach.message}
+                        text={f.outreach.message ?? ''}
                         className="text-[var(--ink-4)] hover:text-[var(--teal)]"
                       />
                     </div>

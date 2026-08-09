@@ -174,7 +174,7 @@ export function SwipeCard({ card, isActive, onSwipeLeft, onSwipeRight }: SwipeCa
                       card.job.location && `Location: ${card.job.location}`,
                       card.job.remote && `Remote: ${card.job.remote}`,
                       formatSalary(card.job.salaryMin, card.job.salaryMax) && `Salary: ${formatSalary(card.job.salaryMin, card.job.salaryMax)}`,
-                      card.job.jobUrl,
+                      card.job.id && `Link: ${window.location.origin}/jobs/${card.job.id}`,
                     ].filter(Boolean).join('\n')}
                     className="text-muted-foreground hover:text-foreground"
                   />
@@ -211,7 +211,7 @@ export function SwipeCard({ card, isActive, onSwipeLeft, onSwipeRight }: SwipeCa
                 )}
                 
                 {card.job.jobUrl && (
-                  <a href={card.job.jobUrl} target="_blank" rel="noreferrer" className="text-xs text-primary hover:underline flex items-center gap-1 inline-flex mt-2">
+                  <a href={`/jobs/${card.job.id}`} target="_blank" rel="noreferrer" className="text-xs text-primary hover:underline flex items-center gap-1 inline-flex mt-2">
                     View Role <ExternalLink className="w-3 h-3" />
                   </a>
                 )}
@@ -300,7 +300,7 @@ export function SwipeCard({ card, isActive, onSwipeLeft, onSwipeRight }: SwipeCa
                   </p>
                   <div className="relative flex justify-end gap-1 pt-1.5">
                     <CopyButton
-                      text={f.outreach.subject ? `Subject: ${f.outreach.subject}\n\n${f.outreach.message}` : f.outreach.message}
+                      text={f.outreach.subject ? `Subject: ${f.outreach.subject}\n\n${f.outreach.message ?? ''}` : (f.outreach.message ?? '')}
                       size="icon-sm"
                       className="text-muted-foreground hover:text-foreground"
                     />
