@@ -9,6 +9,7 @@ import { MapPin, Users, Building, ExternalLink, Briefcase, Mail, AlertCircle } f
 import { ComposeDM } from './ComposeDM';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card } from '@/components/ui/card';
+import { CopyButton } from '@/components/ui/CopyButton';
 
 interface SwipeCardProps {
   card: DeckCard;
@@ -139,8 +140,14 @@ export function SwipeCard({ card, isActive, onSwipeLeft, onSwipeRight }: SwipeCa
 
             {card.company.description && (
               <div className="text-sm">
-                <div className={`text-foreground/90 ${aboutExpanded ? '' : 'line-clamp-3'}`}>
-                  {card.company.hiringDescription || card.company.description}
+                <div className="flex items-start justify-between gap-2">
+                  <div className={`text-foreground/90 ${aboutExpanded ? '' : 'line-clamp-3'}`}>
+                    {card.company.hiringDescription || card.company.description}
+                  </div>
+                  <CopyButton
+                    text={card.company.hiringDescription || card.company.description}
+                    className="-mr-1 mt-0.5 text-muted-foreground hover:text-foreground"
+                  />
                 </div>
                 {(card.company.hiringDescription || card.company.description).length > 150 && (
                   <button 
@@ -160,6 +167,17 @@ export function SwipeCard({ card, isActive, onSwipeLeft, onSwipeRight }: SwipeCa
               <div>
                 <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
                   <Briefcase className="w-4 h-4" /> Open Role
+                  <span className="flex-1" />
+                  <CopyButton
+                    text={[
+                      card.job.title,
+                      card.job.location && `Location: ${card.job.location}`,
+                      card.job.remote && `Remote: ${card.job.remote}`,
+                      formatSalary(card.job.salaryMin, card.job.salaryMax) && `Salary: ${formatSalary(card.job.salaryMin, card.job.salaryMax)}`,
+                      card.job.jobUrl,
+                    ].filter(Boolean).join('\n')}
+                    className="text-muted-foreground hover:text-foreground"
+                  />
                 </h3>
                 <div className="mb-2">
                   <h4 className="text-lg font-semibold">{card.job.title}</h4>
@@ -245,7 +263,13 @@ export function SwipeCard({ card, isActive, onSwipeLeft, onSwipeRight }: SwipeCa
                 </div>
 
                 {f.founder.bio && (
-                  <p className="text-sm text-foreground/80 line-clamp-3">{f.founder.bio}</p>
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-sm text-foreground/80 line-clamp-3 flex-1">{f.founder.bio}</p>
+                    <CopyButton
+                      text={f.founder.bio}
+                      className="-mr-1 mt-0.5 text-muted-foreground hover:text-foreground"
+                    />
+                  </div>
                 )}
 
                 <div className="flex items-center gap-2 text-xs">
@@ -254,6 +278,10 @@ export function SwipeCard({ card, isActive, onSwipeLeft, onSwipeRight }: SwipeCa
                     <span className="truncate font-medium">{f.email.address}</span>
                     {renderDot(f.email.smtpValid)}
                   </div>
+                  <CopyButton
+                    text={f.email.address}
+                    className="-ml-1 text-muted-foreground hover:text-foreground"
+                  />
                   {f.email.confidence && (
                     <span className="text-muted-foreground whitespace-nowrap">{f.email.confidence}% match</span>
                   )}
@@ -270,6 +298,13 @@ export function SwipeCard({ card, isActive, onSwipeLeft, onSwipeRight }: SwipeCa
                   <p className="text-sm font-sans italic text-foreground/80 line-clamp-2">
                     &ldquo;{f.outreach.message}&rdquo;
                   </p>
+                  <div className="relative flex justify-end gap-1 pt-1.5">
+                    <CopyButton
+                      text={f.outreach.subject ? `Subject: ${f.outreach.subject}\n\n${f.outreach.message}` : f.outreach.message}
+                      size="icon-sm"
+                      className="text-muted-foreground hover:text-foreground"
+                    />
+                  </div>
                 </div>
 
                 <Button className="w-full font-semibold rounded-xl" size="lg" onClick={() => setComposeFounder(f)}>

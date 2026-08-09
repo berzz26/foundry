@@ -10,6 +10,7 @@ import {
   Building, Users, Briefcase, ExternalLink
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { CopyButton } from '@/components/ui/CopyButton';
 
 
 
@@ -305,6 +306,10 @@ export function SwipeDeck() {
                       <div className="min-w-0 flex-1 flex items-center gap-2">
                         <p className="text-sm font-semibold text-[var(--ink)] truncate">{f.founder.fullName}</p>
                         <span className="text-[10px] text-[var(--ink-4)] whitespace-nowrap">{f.email.address}</span>
+                        <CopyButton
+                          text={f.email.address}
+                          className="text-[var(--ink-4)] hover:text-[var(--teal)]"
+                        />
                       </div>
                       {f.founder.linkedin && (
                         <a
@@ -319,11 +324,23 @@ export function SwipeDeck() {
                       )}
                     </div>
                     {f.founder.bio && (
-                      <p className="text-xs text-[var(--ink-4)] leading-snug line-clamp-4">{f.founder.bio}</p>
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="text-xs text-[var(--ink-4)] leading-snug line-clamp-4 flex-1">{f.founder.bio}</p>
+                        <CopyButton
+                          text={f.founder.bio}
+                          className="-mt-0.5 text-[var(--ink-4)] hover:text-[var(--teal)]"
+                        />
+                      </div>
                     )}
-                    <p className="text-xs text-[var(--ink-3)] italic line-clamp-2 border-l-2 border-[var(--border)] pl-2">
-                      &ldquo;{f.outreach.message}&rdquo;
-                    </p>
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="text-xs text-[var(--ink-3)] italic line-clamp-2 border-l-2 border-[var(--border)] pl-2 flex-1">
+                        &ldquo;{f.outreach.message}&rdquo;
+                      </p>
+                      <CopyButton
+                        text={f.outreach.message}
+                        className="text-[var(--ink-4)] hover:text-[var(--teal)]"
+                      />
+                    </div>
                     <button
                       onClick={() => setCompose({ card, founder: f })}
                       className="w-full flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-semibold bg-[var(--ink)] text-white hover:bg-[var(--teal)] transition-colors shadow-sm"
