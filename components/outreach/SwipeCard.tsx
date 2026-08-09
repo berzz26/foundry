@@ -185,8 +185,8 @@ export function SwipeCard({ card, isActive, onSwipeLeft, onSwipeRight }: SwipeCa
 
                 {card.job.skills && card.job.skills.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 mb-3">
-                    {card.job.skills.slice(0, 5).map(skill => (
-                      <Badge key={skill} variant="outline" className="text-[10px] py-0">{skill}</Badge>
+                    {card.job.skills.slice(0, 5).map((skill, idx) => (
+                      <Badge key={`${skill}-${idx}`} variant="outline" className="text-[10px] py-0">{skill}</Badge>
                     ))}
                     {card.job.skills.length > 5 && <Badge variant="outline" className="text-[10px] py-0">+{card.job.skills.length - 5}</Badge>}
                   </div>
