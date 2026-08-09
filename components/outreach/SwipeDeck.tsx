@@ -139,14 +139,14 @@ export function SwipeDeck() {
   const renderDeck = () => {
     if (cards.length === 0 || currentIndex >= cards.length) return renderEmpty();
     return (
-      <div className="relative w-full max-w-[420px] md:max-w-4xl h-[750px] max-h-[85vh] md:h-[650px] flex items-center justify-center">
+      <div className="relative w-full max-w-[420px] md:max-w-5xl h-[750px] max-h-[85vh] md:h-[72vh] flex items-center justify-center">
         {/* Desktop Navigation Buttons */}
-        <div className="absolute -left-16 lg:-left-24 hidden md:flex items-center justify-center z-20">
+        <div className="absolute -left-16 lg:-left-28 hidden md:flex items-center justify-center z-20">
           <Button variant="outline" size="icon" onClick={handlePrev} disabled={currentIndex === 0} className="w-12 h-12 rounded-full shadow-md bg-background/80 backdrop-blur border-border hover:bg-background">
             <ChevronLeft className="w-6 h-6" />
           </Button>
         </div>
-        <div className="absolute -right-16 lg:-right-24 hidden md:flex items-center justify-center z-20">
+        <div className="absolute -right-16 lg:-right-28 hidden md:flex items-center justify-center z-20">
           <Button variant="outline" size="icon" onClick={handleSwipe} disabled={currentIndex >= cards.length} className="w-12 h-12 rounded-full shadow-md bg-background/80 backdrop-blur border-border hover:bg-background">
             <ChevronRight className="w-6 h-6" />
           </Button>
@@ -189,7 +189,7 @@ export function SwipeDeck() {
     if (cards.length === 0) return renderEmpty();
     return (
       <div id="list-scroll-container" className="w-full h-full overflow-y-auto p-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 max-w-full mx-auto items-start">
           {cards.map((card) => (
             <div
               key={card.outreachId}
@@ -281,14 +281,9 @@ export function SwipeDeck() {
                           {f.founder.firstName?.[0]}{f.founder.lastName?.[0]}
                         </AvatarFallback>
                       </Avatar>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <p className="text-sm font-semibold text-[var(--ink)] truncate">{f.founder.fullName}</p>
-                          <span className="text-[10px] text-[var(--ink-4)] whitespace-nowrap">{f.email.address}</span>
-                        </div>
-                        {f.founder.bio && (
-                          <p className="text-xs text-[var(--ink-4)] truncate">{f.founder.bio.split('.')[0]}</p>
-                        )}
+                      <div className="min-w-0 flex-1 flex items-center gap-2">
+                        <p className="text-sm font-semibold text-[var(--ink)] truncate">{f.founder.fullName}</p>
+                        <span className="text-[10px] text-[var(--ink-4)] whitespace-nowrap">{f.email.address}</span>
                       </div>
                       {f.founder.linkedin && (
                         <a
@@ -302,8 +297,11 @@ export function SwipeDeck() {
                         </a>
                       )}
                     </div>
+                    {f.founder.bio && (
+                      <p className="text-xs text-[var(--ink-4)] leading-snug line-clamp-4">{f.founder.bio}</p>
+                    )}
                     <p className="text-xs text-[var(--ink-3)] italic line-clamp-2 border-l-2 border-[var(--border)] pl-2">
-                      "{f.outreach.message}"
+                      &ldquo;{f.outreach.message}&rdquo;
                     </p>
                     <button
                       onClick={() => setCompose({ card, founder: f })}

@@ -79,7 +79,7 @@ export function SwipeCard({ card, isActive, onSwipeLeft, onSwipeRight }: SwipeCa
       style={{ zIndex: isActive ? 10 : 0 }}
     >
       <motion.div
-        className="relative w-full max-w-[420px] md:max-w-4xl h-[750px] max-h-[85vh] md:h-[650px] bg-card rounded-3xl shadow-2xl border border-border flex flex-col md:flex-row overflow-hidden pointer-events-auto"
+        className="relative w-full max-w-[420px] md:max-w-5xl h-[750px] max-h-[85vh] md:h-[72vh] bg-card rounded-3xl shadow-2xl border border-border flex flex-col md:flex-row overflow-hidden pointer-events-auto"
         style={{ x, rotate, opacity }}
         drag={isActive && !composeFounder ? "x" : false}
         dragConstraints={{ left: 0, right: 0 }}
