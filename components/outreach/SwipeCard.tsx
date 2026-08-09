@@ -32,11 +32,9 @@ export function SwipeCard({ card, isActive, onSwipeLeft, onSwipeRight }: SwipeCa
   const handleDragEnd = async (e: any, info: PanInfo) => {
     const threshold = 120;
     if (info.offset.x > threshold) {
-      // Swiped right -> Interested -> Show Compose
+      // Swiped right -> Interested / Next
       await controls.start({ x: 300, opacity: 0, transition: { duration: 0.3 } });
-      setShowCompose(true);
-      // Bring back to center but keep it hidden behind compose (or we could just let compose cover it)
-      controls.set({ x: 0, opacity: 1 });
+      onSwipeRight(cardKey);
     } else if (info.offset.x < -threshold) {
       // Swiped left -> Skip -> Next card
       await controls.start({ x: -300, opacity: 0, transition: { duration: 0.3 } });

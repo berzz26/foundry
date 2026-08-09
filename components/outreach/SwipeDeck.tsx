@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { getOutreachCards, SwipeCard as SwipeCardType } from '@/lib/api/outreach';
 import { SwipeCard } from './SwipeCard';
-import { Loader2, RefreshCcw, Search, Filter } from 'lucide-react';
+import { Loader2, RefreshCcw, Search, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Toggle } from '@/components/ui/toggle';
@@ -11,6 +11,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 export function SwipeDeck() {
   const [cards, setCards] = useState<SwipeCardType[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
@@ -36,6 +37,7 @@ export function SwipeDeck() {
       
       if (reset) {
         setCards(res.cards);
+        setCurrentIndex(0);
       } else {
         setCards(prev => [...prev, ...res.cards]);
       }
@@ -57,13 +59,17 @@ export function SwipeDeck() {
 
   // Refetch more if stack gets small
   useEffect(() => {
-    if (cards.length < 3 && hasNext && !isFetchingMore && !loading) {
+    if (cards.length - currentIndex < 3 && hasNext && !isFetchingMore && !loading) {
       fetchCards(false);
     }
-  }, [cards.length, hasNext, isFetchingMore, loading, fetchCards]);
+  }, [cards.length, currentIndex, hasNext, isFetchingMore, loading, fetchCards]);
 
-  const handleSwipe = (cardKey: string) => {
-    setCards(prev => prev.filter(c => `${c.outreachId}-${c.founderId}` !== cardKey));
+  const handleSwipe = () => {
+    setCurrentIndex(prev => prev + 1);
+  };
+  
+  const handlePrev = () => {
+    setCurrentIndex(prev => Math.max(0, prev - 1));
   };
 
   const handleRetry = () => {
@@ -112,7 +118,7 @@ export function SwipeDeck() {
             <p className="text-muted-foreground mb-6">{error}</p>
             <Button onClick={handleRetry}>Try Again</Button>
           </div>
-        ) : cards.length === 0 ? (
+        ) : cards.length === 0 || currentIndex >= cards.length ? (
           <div className="flex flex-col items-center justify-center text-center p-6 max-w-md">
             <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-6">
               <span className="text-4xl">🎉</span>
@@ -128,10 +134,25 @@ export function SwipeDeck() {
             )}
           </div>
         ) : (
-          <div className="relative w-full max-w-[420px] md:max-w-4xl h-[750px] max-h-[85vh] md:h-[650px]">
-            <AnimatePresence>
-              {/* Render the deck backwards so the first card is on top visually */}
-              {cards.slice(0, 3).reverse().map((card, idx, arr) => {
+          <div className="relative w-full max-w-[420px] md:max-w-4xl h-[750px] max-h-[85vh] md:h-[650px] flex items-center justify-center">
+            
+            {/* Desktop Navigation Buttons */}
+            <div className="absolute -left-16 lg:-left-24 hidden md:flex items-center justify-center z-20">
+              <Button variant="outline" size="icon" onClick={handlePrev} disabled={currentIndex === 0} className="w-12 h-12 rounded-full shadow-md bg-background/80 backdrop-blur border-border hover:bg-background">
+                <ChevronLeft className="w-6 h-6" />
+              </Button>
+            </div>
+            
+            <div className="absolute -right-16 lg:-right-24 hidden md:flex items-center justify-center z-20">
+              <Button variant="outline" size="icon" onClick={() => handleSwipe()} disabled={currentIndex >= cards.length} className="w-12 h-12 rounded-full shadow-md bg-background/80 backdrop-blur border-border hover:bg-background">
+                <ChevronRight className="w-6 h-6" />
+              </Button>
+            </div>
+
+            <div className="relative w-full h-full">
+              <AnimatePresence>
+                {/* Render the deck backwards so the first card is on top visually */}
+                {cards.slice(currentIndex, currentIndex + 3).reverse().map((card, idx, arr) => {
                 const isTop = idx === arr.length - 1;
                 const distanceFromTop = arr.length - 1 - idx; // 0 for top, 1 for next, 2 for 3rd
                 
@@ -157,7 +178,8 @@ export function SwipeDeck() {
                   </motion.div>
                 );
               })}
-            </AnimatePresence>
+              </AnimatePresence>
+            </div>
           </div>
         )}
 
