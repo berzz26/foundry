@@ -46,13 +46,22 @@ export function SwipeDeck() {
       
       const res = await getOutreachCards(limit, currentOffset, undefined, search, hasJob ? true : undefined);
       
+      const dedupe = (list: SwipeCardType[]) => {
+        const seen = new Set<number>();
+        return list.filter(c => {
+          if (seen.has(c.outreachId)) return false;
+          seen.add(c.outreachId);
+          return true;
+        });
+      };
+
       if (reset) {
-        setCards(res.cards);
+        setCards(dedupe(res.cards));
         setCurrentIndex(0);
       } else {
         setCards(prev => {
           const seen = new Set(prev.map(c => c.outreachId));
-          return [...prev, ...res.cards.filter(c => !seen.has(c.outreachId))];
+          return [...prev, ...dedupe(res.cards).filter(c => !seen.has(c.outreachId))];
         });
       }
       
