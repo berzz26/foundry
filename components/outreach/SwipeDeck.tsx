@@ -165,9 +165,10 @@ export function SwipeDeck() {
                     opacity: 1, 
                     scale: 1 - distanceFromTop * 0.04, 
                     y: distanceFromTop * 20,
-                    zIndex: 10 - distanceFromTop
+                    zIndex: 10 - distanceFromTop,
+                    filter: distanceFromTop > 0 ? `blur(${distanceFromTop * 4}px)` : 'blur(0px)'
                   }}
-                  exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+                  exit={{ opacity: 0, scale: 0.9, filter: 'blur(8px)', transition: { duration: 0.2 } }}
                   className="absolute inset-0 origin-bottom"
                 >
                   <SwipeCard 
