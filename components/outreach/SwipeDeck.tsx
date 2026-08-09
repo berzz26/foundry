@@ -222,7 +222,7 @@ export function SwipeDeck() {
               <div className="p-4 border-b border-[var(--border)] bg-[var(--bg-alt)] flex items-start gap-3">
               {card.company.smallLogoUrl || card.company.logoUrl ? (
                 <img
-                  src={card.company.smallLogoUrl || card.company.logoUrl}
+                  src={card.company.smallLogoUrl || card.company.logoUrl || undefined}
                   alt={card.company.name}
                   className="w-10 h-10 rounded object-contain shrink-0"
                 />
