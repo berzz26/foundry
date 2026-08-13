@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { getOutreachCards, DeckCard, FounderRecipient, groupOutreachCards } from '@/lib/api/outreach';
+import { getOutreachCards, DeckCard, FounderRecipient, groupOutreachCards, normalizeWebsiteUrl } from '@/lib/api/outreach';
 import { SwipeCard } from './SwipeCard';
 import { ComposeDM } from './ComposeDM';
+import { CopyMetaButton } from './CopyMetaButton';
 import {
   Loader2, RefreshCcw, Search, Filter,
   ChevronLeft, ChevronRight, LayoutGrid, Layers, Mail,
@@ -256,6 +257,17 @@ export function SwipeDeck() {
                         <Users className="w-3 h-3" /> {card.company.teamSize}
                       </span>
                     )}
+                    {card.company.website && (
+                      <a
+                        href={normalizeWebsiteUrl(card.company.website)}
+                        target="_blank"
+                        rel="noreferrer"
+                        onClick={e => e.stopPropagation()}
+                        className="flex items-center gap-1 hover:text-[var(--teal)]"
+                      >
+                        <ExternalLink className="w-3 h-3" /> Visit Site
+                      </a>
+                    )}
                   </div>
                 </div>
                 {card.company.isHiring && (
@@ -263,6 +275,10 @@ export function SwipeDeck() {
                     <Briefcase className="w-3 h-3" /> Hiring
                   </span>
                 )}
+                <CopyMetaButton
+                  card={card}
+                  className="shrink-0 -mt-0.5 text-[var(--ink-4)] hover:text-[var(--teal)]"
+                />
               </div>
 
               {/* Role */}

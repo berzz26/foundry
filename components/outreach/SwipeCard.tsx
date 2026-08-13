@@ -2,12 +2,13 @@
 
 import React, { useState } from 'react';
 import { motion, useMotionValue, useTransform, useAnimation, PanInfo } from 'framer-motion';
-import { DeckCard, FounderRecipient } from '@/lib/api/outreach';
+import { DeckCard, FounderRecipient, normalizeWebsiteUrl } from '@/lib/api/outreach';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { MapPin, Users, Building, ExternalLink, Briefcase, Mail, AlertCircle } from 'lucide-react';
 import { ComposeDM } from './ComposeDM';
 import { SaveJobButton } from './SaveJobButton';
+import { CopyMetaButton } from './CopyMetaButton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card } from '@/components/ui/card';
 import { CopyButton } from '@/components/ui/CopyButton';
@@ -56,7 +57,6 @@ export function SwipeCard({ card, isActive, onSwipeLeft, onSwipeRight }: SwipeCa
 
   const handleSent = () => {
     setComposeFounder(null);
-    onSwipeRight(cardKey);
   };
 
   // Company logo placeholder or URL
@@ -121,6 +121,7 @@ export function SwipeCard({ card, isActive, onSwipeLeft, onSwipeRight }: SwipeCa
                   </p>
                 )}
               </div>
+              <CopyMetaButton card={card} className="-mt-1 text-muted-foreground hover:text-foreground" />
             </div>
 
             <div className="flex flex-wrap gap-2 text-xs text-muted-foreground mb-4">
@@ -138,6 +139,16 @@ export function SwipeCard({ card, isActive, onSwipeLeft, onSwipeRight }: SwipeCa
                 <div className="flex items-center gap-1 bg-muted px-2 py-1 rounded-md">
                   <Users className="w-3 h-3" /> {card.company.teamSize}
                 </div>
+              )}
+              {card.company.website && (
+                <a
+                  href={normalizeWebsiteUrl(card.company.website)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-1 bg-muted px-2 py-1 rounded-md text-primary hover:underline"
+                >
+                  <ExternalLink className="w-3 h-3" /> Visit Site
+                </a>
               )}
               {card.company.isHiring && (
                 <div className="flex items-center gap-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2 py-1 rounded-md">
